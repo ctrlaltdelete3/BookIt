@@ -19,51 +19,26 @@ namespace BookIt.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequestDto registerRequestDto)
         {
-            try
+            if (ModelState.IsValid == false)
             {
-                if (ModelState.IsValid == false)
-                {
-                    return BadRequest(ModelState);
-                }
+                //TODO: check should I throw KeyNotFoundException here instead of returning BadRequest
+                return BadRequest(ModelState);
+            }
 
-                var response = await _userService.RegisterAsync(registerRequestDto);
-                return Ok(response);
-
-            }
-            catch (InvalidOperationException ex)
-            {
-                //TODO: create ErrorResponseDTO and set error message to it instead of this
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
-            }
+            var response = await _userService.RegisterAsync(registerRequestDto);
+            return Ok(response);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequestDto loginRequestDto)
         {
-            try
+            if (ModelState.IsValid == false)
             {
-                //TODO: repetitive - extract to helper
-                if (ModelState.IsValid == false)
-                {
-                    return BadRequest(ModelState);
-                }
+                return BadRequest(ModelState);
+            }
 
-                var response = await _userService.LoginAsync(loginRequestDto);
-                return Ok(response);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                //TODO: repetitive - extract to helper
-                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
-            }
+            var response = await _userService.LoginAsync(loginRequestDto);
+            return Ok(response);
         }
 
         [Authorize]

@@ -16,15 +16,15 @@ namespace BookIt.Api.Middleware
         }
         public async Task InvokeAsync(HttpContext context)
         {
-			try
-			{
-				await _next(context);
-			}
-			catch (Exception ex)
-			{
-                _logger.LogError(ex, $"An error occurred: {ex.Message}");
+            try
+            {
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred: {Message}", ex.Message);
                 await HandleExceptionAsync(context, ex);
-			}
+            }
         }
 
         public Task HandleExceptionAsync(HttpContext context, Exception exception)
@@ -61,7 +61,7 @@ namespace BookIt.Api.Middleware
                 Message = errorMessage,
                 StatusCode = (int)statusCode,
                 Details = exception.Message,
-                Timestamp = DateTime.Now
+                Timestamp = DateTime.UtcNow
             };
 
             context.Response.ContentType = "application/json";
