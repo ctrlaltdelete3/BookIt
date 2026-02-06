@@ -1,0 +1,53 @@
+## Ignore Visual Studio temporary files, build results
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio cache
+.vs/
+
+# VS Code
+.vscode/
+
+# Rider
+.idea/
+
+# NuGet Packages
+*.nupkg
+packages/
+
+# Database files
+*.mdf
+*.ldf
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Sensitive config files
+appsettings.Development.json
+appsettings.Local.json
+**/appsettings.*.json
+!**/appsettings.json
+ConnectionStrings.json
+
+# Certificate files
+*.pfx
+*.p12
