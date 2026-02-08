@@ -19,7 +19,7 @@ namespace BookIt.Services.Implementations
         {
             if (await _userRepository.EmailExistsAsync(registerRequestDto.Email))
             {
-                //TODO: switch this with custom exception (Create one for emailexists)
+                //TODO: fix later - message and details in error response are the same, check it out
                 throw new InvalidOperationException("Email already exists.");
             }
 

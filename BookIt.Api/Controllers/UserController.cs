@@ -11,6 +11,7 @@ namespace BookIt.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+
         public UserController(IUserService userService)
         {
             _userService = userService;
@@ -19,12 +20,6 @@ namespace BookIt.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequestDto registerRequestDto)
         {
-            if (ModelState.IsValid == false)
-            {
-                //TODO: check should I throw KeyNotFoundException here instead of returning BadRequest
-                return BadRequest(ModelState);
-            }
-
             var response = await _userService.RegisterAsync(registerRequestDto);
             return Ok(response);
         }
@@ -32,11 +27,6 @@ namespace BookIt.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequestDto loginRequestDto)
         {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(ModelState);
-            }
-
             var response = await _userService.LoginAsync(loginRequestDto);
             return Ok(response);
         }

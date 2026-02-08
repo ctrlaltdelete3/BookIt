@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using FluentValidation;
+using BookIt.Application.Validators;
+using BookIt.Api.Filters;
 
 namespace BookIt.Api
 {
@@ -19,7 +22,10 @@ namespace BookIt.Api
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<ValidationFilter>();
+            });
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<BookItDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -47,6 +53,9 @@ namespace BookIt.Api
             builder.Services.AddScoped<IUserService, UserServices>();
             builder.Services.AddScoped<IJwtService, JwtService>();
 
+            //validators:
+            builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDtoValidator>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -60,7 +69,7 @@ namespace BookIt.Api
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
-            
+
             app.UseAuthorization();
 
             app.MapControllers();
