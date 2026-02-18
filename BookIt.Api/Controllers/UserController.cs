@@ -1,4 +1,4 @@
-﻿using BookIt.Application.DTOs;
+﻿using BookIt.Application.DTOs.User;
 using BookIt.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-﻿using BookIt.Application.DTOs;
+﻿using BookIt.Application.DTOs.User;
 using FluentValidation;
 
 namespace BookIt.Application.Validators

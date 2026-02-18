@@ -1,4 +1,4 @@
-﻿namespace BookIt.Application.DTOs
+﻿namespace BookIt.Application.DTOs.User
 {
     public class UserResponseDto
     {

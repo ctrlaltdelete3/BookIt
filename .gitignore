@@ -51,3 +51,6 @@ ConnectionStrings.json
 # Certificate files
 *.pfx
 *.p12
+
+# Claude Code
+.claude/

@@ -1,4 +1,4 @@
-﻿using BookIt.Application.DTOs;
+﻿using BookIt.Application.DTOs.User;
 using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
 using BookIt.Domain.Entities;
@@ -73,7 +73,7 @@ namespace BookIt.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(id);
                 if (user == null)
                 {
-                    //TODO: handle this case here!
+                    return null;
                 }
                 var userResponseDto = new UserResponseDto
                 {

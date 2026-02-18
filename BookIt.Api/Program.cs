@@ -50,7 +50,9 @@ namespace BookIt.Api
             });
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ITenantRepository, TenantRepository>();
             builder.Services.AddScoped<IUserService, UserServices>();
+            builder.Services.AddScoped<ITenantService, TenantService>();
             builder.Services.AddScoped<IJwtService, JwtService>();
 
             //validators:
