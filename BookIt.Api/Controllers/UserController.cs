@@ -37,12 +37,6 @@ namespace BookIt.Api.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var user = await _userService.GetUserAsync(userId);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
             return Ok(user);
         }
     }

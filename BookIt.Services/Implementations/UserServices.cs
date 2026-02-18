@@ -65,7 +65,7 @@ namespace BookIt.Services.Implementations
             return response;
         }
 
-        public async Task<UserResponseDto?> GetUserAsync(string? userId)
+        public async Task<UserResponseDto> GetUserAsync(string? userId)
         {
             if (string.IsNullOrEmpty(userId) == false
                 && int.TryParse(userId, out int id))
@@ -73,7 +73,7 @@ namespace BookIt.Services.Implementations
                 var user = await _userRepository.GetByIdAsync(id);
                 if (user == null)
                 {
-                    return null;
+                    throw new UnauthorizedAccessException("User not authenticated.");
                 }
                 var userResponseDto = new UserResponseDto
                 {
@@ -88,7 +88,7 @@ namespace BookIt.Services.Implementations
                 return userResponseDto;
             }
 
-            return null;
+            throw new UnauthorizedAccessException("User not authenticated.");
         }
 
         public AuthResponseDto GenerateResponse(User user)
