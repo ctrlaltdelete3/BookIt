@@ -32,6 +32,7 @@ namespace BookIt.DAL.Repositories
         {
             var service = await _context.Services
                 .Include(s => s.Tenant)
+                .Where(s => s.IsActive)
                 .Where(s => s.TenantId == tenantId).ToListAsync();
             return service;
         }
