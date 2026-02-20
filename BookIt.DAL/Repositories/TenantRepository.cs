@@ -14,11 +14,10 @@ namespace BookIt.DAL.Repositories
             _context = context;
         }
 
-        public async Task<Tenant> CreateAsync(Tenant tenant)
+        public async Task CreateAsync(Tenant tenant)
         {
             _context.Tenants.Add(tenant);
             await _context.SaveChangesAsync();
-            return tenant;
         }
 
         public async Task<Tenant?> GetByIdAsync(int id)

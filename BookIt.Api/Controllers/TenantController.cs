@@ -12,10 +12,12 @@ namespace BookIt.Api.Controllers
     public class TenantController : ControllerBase
     {
         private readonly ITenantService _tenantService;
+        private readonly IServiceService _service;
 
-        public TenantController(ITenantService tenantService)
+        public TenantController(ITenantService tenantService, IServiceService service)
         {
             _tenantService = tenantService;
+            _service = service;
         }
 
         [HttpPost]
@@ -40,6 +42,14 @@ namespace BookIt.Api.Controllers
         {
             var response = await _tenantService.GetTenantBySlugAsync(slug);
             return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{slug}/services")]
+        public async Task<IActionResult> GetAllServicesByTenantAsync(string slug)
+        {
+            var result = await _service.GetAllServicesByTenant(slug);
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
