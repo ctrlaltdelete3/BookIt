@@ -13,11 +13,13 @@ namespace BookIt.Api.Controllers
     {
         private readonly ITenantService _tenantService;
         private readonly IServiceService _service;
+        private readonly IWorkingHourService _workingHourService;
 
-        public TenantController(ITenantService tenantService, IServiceService service)
+        public TenantController(ITenantService tenantService, IServiceService service, IWorkingHourService workingHourService)
         {
             _tenantService = tenantService;
             _service = service;
+            _workingHourService = workingHourService;
         }
 
         [HttpPost]
@@ -49,6 +51,14 @@ namespace BookIt.Api.Controllers
         public async Task<IActionResult> GetAllServicesByTenantAsync(string slug)
         {
             var result = await _service.GetAllServicesByTenant(slug);
+            return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{slug}/working-hours")]
+        public async Task<IActionResult> GetWorkingHoursByTenantAsync(string slug)
+        {
+            var result = await _workingHourService.GetAllAsync(slug);
             return Ok(result);
         }
 

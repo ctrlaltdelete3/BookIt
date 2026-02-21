@@ -357,19 +357,19 @@ namespace BookIt.DAL.Migrations
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("EndTime")
+                    b.Property<TimeOnly?>("EndTime")
                         .HasColumnType("time");
 
                     b.Property<bool>("IsWorkingDay")
                         .HasColumnType("bit");
 
-                    b.Property<TimeSpan?>("PauseEnd")
+                    b.Property<TimeOnly?>("PauseEnd")
                         .HasColumnType("time");
 
-                    b.Property<TimeSpan?>("PauseStart")
+                    b.Property<TimeOnly?>("PauseStart")
                         .HasColumnType("time");
 
-                    b.Property<TimeSpan?>("StartTime")
+                    b.Property<TimeOnly?>("StartTime")
                         .HasColumnType("time");
 
                     b.Property<int>("TenantId")
