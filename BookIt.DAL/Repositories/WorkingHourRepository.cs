@@ -13,12 +13,12 @@ namespace BookIt.DAL.Repositories
             _context = context;
         }
 
-        public async Task<List<WorkingHour>> GetAll(int tenantId)
+        public async Task<List<WorkingHour>> GetAllAsync(int tenantId)
         {
             return await _context.WorkingHours.Where(h => h.TenantId == tenantId).ToListAsync();
         }
 
-        public async Task SetAll(List<WorkingHour> workingHours, int tenantId)
+        public async Task SetAllAsync(List<WorkingHour> workingHours, int tenantId)
         {
             //remove old working hours before setting up new ones
             DeleteAllForTenant(tenantId);

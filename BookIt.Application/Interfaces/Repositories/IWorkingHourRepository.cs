@@ -4,7 +4,7 @@ namespace BookIt.Application.Interfaces.Repositories
 {
     public interface IWorkingHourRepository
     {
-        Task<List<WorkingHour>> GetAll(int tenantId);
-        Task SetAll(List<WorkingHour> workingHours, int tenantId);
+        Task<List<WorkingHour>> GetAllAsync(int tenantId);
+        Task SetAllAsync(List<WorkingHour> workingHours, int tenantId);
     }
 }

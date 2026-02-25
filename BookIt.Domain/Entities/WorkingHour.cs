@@ -7,14 +7,14 @@
         public int TenantId { get; set; }
         public Tenant Tenant { get; set; } = null!;
 
-        // 1 = monday, 7 = sunday
+        // currently: 0 = sunday, 1 = monday, ....,  6 = saturday
         public int DayOfWeek { get; set; }
 
         public bool IsWorkingDay { get; set; } = true;
 
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
-
+        //TODO: think how to implement validation so pause and service don't overlap
         public TimeOnly? PauseStart { get; set; }
         public TimeOnly? PauseEnd { get; set; }
     }

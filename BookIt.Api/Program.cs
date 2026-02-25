@@ -53,11 +53,14 @@ namespace BookIt.Api
             builder.Services.AddScoped<ITenantRepository, TenantRepository>();
             builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
             builder.Services.AddScoped<IWorkingHourRepository, WorkingHourRepository>();
+            builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
             builder.Services.AddScoped<IUserService, UserServices>();
             builder.Services.AddScoped<ITenantService, TenantService>();
             builder.Services.AddScoped<IServiceService, ServiceService>();
             builder.Services.AddScoped<IWorkingHourService, WorkingHourService>();
+            builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
+            builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
             builder.Services.AddScoped<IJwtService, JwtService>();
 

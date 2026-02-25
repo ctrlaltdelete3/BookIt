@@ -24,6 +24,7 @@ namespace BookIt.DAL.Repositories
         {
             var service = await _context.Services
                 .Include(s => s.Tenant)
+                .Include(s=>s.TimeSlots)
                 .FirstOrDefaultAsync(s => s.Id == id);
             return service;
         }

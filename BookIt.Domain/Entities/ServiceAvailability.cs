@@ -1,5 +1,6 @@
 ﻿namespace BookIt.Domain.Entities
 {
+    //TODO: I think I wont use this, for now at least. everything wil be defined in ServiceTimeSlots
     public class ServiceAvailability
     {
         public int Id { get; set; }

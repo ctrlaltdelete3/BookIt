@@ -23,7 +23,7 @@ namespace BookIt.Services.Implementations
             {
                 throw new KeyNotFoundException("Tenant not found");
             }
-            var result = await _workingHourRepository.GetAll(tenant.Id);
+            var result = await _workingHourRepository.GetAllAsync(tenant.Id);
             return GenerateResponse(result);
         }
 
@@ -53,7 +53,7 @@ namespace BookIt.Services.Implementations
                 };
                 workingHours.Add(workingHour);
             }
-            await _workingHourRepository.SetAll(workingHours, tenantId);
+            await _workingHourRepository.SetAllAsync(workingHours, tenantId);
             return GenerateResponse(workingHours);
         }
 

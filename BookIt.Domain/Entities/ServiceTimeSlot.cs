@@ -7,7 +7,7 @@ namespace BookIt.Domain.Entities
         public int ServiceId { get; set; }
         public Service Service { get; set; } = null!;
 
-        // 1 = monday, 7 = sunday (recurring pattern)
+        // currently: 0 = sunday, 1 = monday, ....,  6 = saturday
         public int DayOfWeek { get; set; }
 
         public TimeOnly StartTime { get; set; }
@@ -15,6 +15,7 @@ namespace BookIt.Domain.Entities
         // tenant može deaktivirati slot bez brisanja
         public bool IsActive { get; set; } = true;
 
+        //TODO: i think i won't be needing this (remove property later if that's correct)
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

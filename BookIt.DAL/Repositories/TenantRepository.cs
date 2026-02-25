@@ -24,6 +24,7 @@ namespace BookIt.DAL.Repositories
         {
             return await _context.Tenants
                 .Include(t => t.OwnerUser)
+                .Include(t=>t.WorkingHours)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
