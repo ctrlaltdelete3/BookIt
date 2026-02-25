@@ -9,13 +9,13 @@ namespace BookIt.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class TenantController : ControllerBase
+    public class TenantsController : ControllerBase
     {
         private readonly ITenantService _tenantService;
         private readonly IServiceService _service;
         private readonly IWorkingHourService _workingHourService;
 
-        public TenantController(ITenantService tenantService, IServiceService service, IWorkingHourService workingHourService)
+        public TenantsController(ITenantService tenantService, IServiceService service, IWorkingHourService workingHourService)
         {
             _tenantService = tenantService;
             _service = service;

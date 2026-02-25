@@ -1,16 +1,17 @@
+using BookIt.Api.Filters;
 using BookIt.Api.Middleware;
 using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
+using BookIt.Application.Validators;
 using BookIt.DAL.Context;
 using BookIt.DAL.Repositories;
 using BookIt.Services.Implementations;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using FluentValidation;
-using BookIt.Application.Validators;
-using BookIt.Api.Filters;
+using System.Text.Json.Serialization;
 
 namespace BookIt.Api
 {
@@ -25,7 +26,12 @@ namespace BookIt.Api
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add<ValidationFilter>();
+            })
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<BookItDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

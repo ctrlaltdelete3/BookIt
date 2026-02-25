@@ -58,7 +58,7 @@ namespace BookIt.Services.Implementations
             var appointmentDbo = await _appointmentRepository.GetByIdAsync(appointment.Id);
 
             //in case there was some issue with creating this appointment:
-            if(appointmentDbo == null)
+            if (appointmentDbo == null)
             {
                 throw new InvalidOperationException("There was an issue with creating the appointment. Please try again.");
             }
@@ -66,13 +66,9 @@ namespace BookIt.Services.Implementations
             return GenerateResponse(appointmentDbo);
         }
 
-        public async Task<AppointmentResponseDto> GetAppointmentByIdAsync(int id)
+        public async Task<AppointmentResponseDto> GetAppointmentByIdAsync(int appointmentId, int userId)
         {
-            var appointment = await _appointmentRepository.GetByIdAsync(id);
-            if (appointment == null)
-            {
-                throw new KeyNotFoundException("Appointment not found.");
-            }
+            var appointment = await GetAppointmentIfAuthorizedAsync(appointmentId, userId, compareBoth: true);
             return GenerateResponse(appointment);
         }
 
@@ -93,19 +89,30 @@ namespace BookIt.Services.Implementations
         }
 
         //TODO: this should be only available to owner, check after controller is created
-        public async Task<List<AppointmentResponseDto>> GetTenantAppointmentsAsync(int tenantId)
+        public async Task<List<AppointmentResponseDto>> GetTenantAppointmentsAsync(int userId)
         {
-            var appointments = await _appointmentRepository.GetAppointmentsByTenantIdAsync(tenantId);
+            var tenant = await _tenantRepository.GetMyTenantAsync(userId);
+
+            if (tenant == null)
+            {
+                throw new KeyNotFoundException("Tenant not found.");
+            }
+
+            var appointments = await _appointmentRepository.GetAppointmentsByTenantIdAsync(tenant.Id);
+
             var listOfAppointments = new List<AppointmentResponseDto>();
+
             if (appointments.Any() == false)
             {
                 return listOfAppointments;
             }
+
             foreach (var appointment in appointments)
             {
                 var response = GenerateResponse(appointment);
                 listOfAppointments.Add(response);
             }
+
             return listOfAppointments;
         }
 
@@ -120,7 +127,7 @@ namespace BookIt.Services.Implementations
                 throw new KeyNotFoundException("Tenant not found.");
             }
 
-            var appointment = await GetAppointmentIfAuthorizedAsync(appointmentId, tenant.Id, true);
+            var appointment = await GetAppointmentIfAuthorizedAsync(appointmentId, tenant.Id, isTenant: true);
 
             appointment.Status = status;
 
@@ -141,7 +148,7 @@ namespace BookIt.Services.Implementations
         public async Task<AppointmentResponseDto> CancelAppointmentAsync(int appointmentId, int userId, string? cancelationMessage)
         {
             var appointment = await GetAppointmentIfAuthorizedAsync(appointmentId, userId);
-            
+
             //check if user has rights to cancel appointment without paying the fee
             var tenant = await _tenantRepository.GetByIdAsync(appointment.TenantId);
 
@@ -206,7 +213,7 @@ namespace BookIt.Services.Implementations
             return false;
         }
 
-        private async Task<Appointment> GetAppointmentIfAuthorizedAsync(int appointmentId, int idToCompare, bool isTenant=false)
+        private async Task<Appointment> GetAppointmentIfAuthorizedAsync(int appointmentId, int idToCompare, bool isTenant = false, bool compareBoth = false)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(appointmentId);
 
@@ -215,11 +222,19 @@ namespace BookIt.Services.Implementations
                 throw new KeyNotFoundException("Appointment not found.");
             }
 
-            if (isTenant)
+            if (compareBoth)
+            {
+                if (idToCompare != appointment.UserId
+                    && idToCompare != appointment.TenantId)
+                {
+                    throw new UnauthorizedAccessException("You are not authorized.");
+                }
+            }
+            else if (isTenant)
             {
                 CheckAuthorization(idToCompare, appointment.TenantId);
             }
-            else 
+            else
             {
                 CheckAuthorization(idToCompare, appointment.UserId);
             }
