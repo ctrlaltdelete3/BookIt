@@ -27,7 +27,7 @@ namespace BookIt.Api.Controllers
         }
 
         [HttpGet("my")]
-        public async Task<IActionResult> GetMyAppointmentAsync()
+        public async Task<IActionResult> GetMyAppointmentsAsync()
         {
             var userId = GetUserIdHelper();
             var result = await _appointmentService.GetMyAppointmentsAsync(userId);
@@ -35,7 +35,7 @@ namespace BookIt.Api.Controllers
         }
 
         [HttpGet("tenant")]
-        public async Task<IActionResult> GetTenantAppointmentAsync()
+        public async Task<IActionResult> GetTenantAppointmentsAsync()
         {
             var userId = GetUserIdHelper();
             var result = await _appointmentService.GetTenantAppointmentsAsync(userId);

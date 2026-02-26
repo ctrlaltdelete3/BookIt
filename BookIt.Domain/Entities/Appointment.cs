@@ -23,11 +23,13 @@ namespace BookIt.Domain.Entities
         public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
 
         public string? Note { get; set; }
+        public string? TenantNote { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ConfirmedAt { get; set; }
         public DateTime? RejectedAt { get; set; }
         public DateTime? CanceledAt { get; set; }
         public string? CancellationReason { get; set; }
+        public string? RejectionReason { get; set; }
     }
 }
