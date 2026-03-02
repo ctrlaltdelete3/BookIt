@@ -100,6 +100,39 @@ namespace BookIt.Services.Implementations
             await _serviceRepository.UpdateAsync(service);
         }
 
+        public async Task CreateServiceTimeSlotsAsync(int serviceId, int tenantId, List<CreateServiceTimeSlotDto> timeSlots)
+        {
+            var service = await GetServiceIfAuthorizedAsync(tenantId, serviceId);
+
+            foreach (var timeSlotDto in timeSlots)
+            {
+                var timeSlot = new ServiceTimeSlot
+                {
+                    DayOfWeek = timeSlotDto.DayOfWeek,
+                    StartTime = timeSlotDto.StartTime,
+                    IsActive = true,
+                    ServiceId = serviceId
+                };
+                service.TimeSlots.Add(timeSlot);
+            }
+            await _serviceRepository.UpdateAsync(service);
+            //TODO: maybe add serivceTimeSlots to ServiceResponseDTO and return it here?
+        }
+
+        public async Task DeleteServiceTimeSlotAsync(int serviceId, int tenantId, int serviceTimeSlotId)
+        {
+            var service = await GetServiceIfAuthorizedAsync(tenantId, serviceId);
+            var timeSlot = service.TimeSlots.FirstOrDefault(t => t.Id == serviceTimeSlotId);
+            
+            if (timeSlot == null)
+            {
+                throw new KeyNotFoundException("Requested time slot not found.");
+            }
+            
+            timeSlot.IsActive = false;
+            await _serviceRepository.UpdateAsync(service);
+        }
+
         #region HelperMethods
 
         private async Task CheckAuthorizationBeforeChangesAsync(int userId, int serviceTenantId)
@@ -115,6 +148,23 @@ namespace BookIt.Services.Implementations
             {
                 throw new UnauthorizedAccessException("You are not authorized to make changes.");
             }
+        }
+
+        private async Task<Service> GetServiceIfAuthorizedAsync(int tenantId, int serviceId)
+        {
+            var service = await _serviceRepository.GetByIdAsync(serviceId);
+
+            if (service == null)
+            {
+                throw new KeyNotFoundException("Requested service not found.");
+            }
+
+            if (service.TenantId != tenantId)
+            {
+                throw new UnauthorizedAccessException("You are not authorized to make changes.");
+            }
+
+            return service;
         }
 
         private async Task<ServiceResponseDto> GenerateServiceResponseAsync(Service service, string tenantName = null)

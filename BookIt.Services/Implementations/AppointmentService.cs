@@ -11,12 +11,15 @@ namespace BookIt.Services.Implementations
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly ITenantRepository _tenantRepository;
+        private readonly IAvailabilityService _availabilityService;
 
-        public AppointmentService(IAppointmentRepository appointmentRepository, IServiceRepository serviceRepository, ITenantRepository tenantRepository)
+        public AppointmentService(IAppointmentRepository appointmentRepository, IServiceRepository serviceRepository, 
+            ITenantRepository tenantRepository, IAvailabilityService availabilityService)
         {
             _appointmentRepository = appointmentRepository;
             _serviceRepository = serviceRepository;
             _tenantRepository = tenantRepository;
+            _availabilityService = availabilityService;
         }
 
         public async Task<AppointmentResponseDto> CreateAppointmentAsync(CreateAppointmentDto appointmentDto, int userId)
@@ -32,12 +35,11 @@ namespace BookIt.Services.Implementations
                 throw new KeyNotFoundException("Tenant not found.");
             }
 
-            //check if service can still be booked 
-            var timeSlotTaken = await _appointmentRepository.IsTimeSlotTaken(tenant.Id, appointmentDto.Date, appointmentDto.StartTime);
-
-            if (timeSlotTaken)
+            //check if requested date is still available for this service
+            var listOfAvailableTimeSlots = await _availabilityService.GetAvailableTimeSlotsAsync(tenant, service, appointmentDto.Date);
+            if (listOfAvailableTimeSlots.Any(t => t == appointmentDto.StartTime) == false)
             {
-                throw new InvalidOperationException("Requested appointment date and/or time is no longer available.");
+                throw new InvalidOperationException("Requested appointment date and/or time is not available.");
             }
 
             var appointment = new Appointment
@@ -88,7 +90,6 @@ namespace BookIt.Services.Implementations
             return listOfAppointments;
         }
 
-        //TODO: this should be only available to owner, check after controller is created
         public async Task<List<AppointmentResponseDto>> GetTenantAppointmentsAsync(int userId)
         {
             var tenant = await _tenantRepository.GetMyTenantAsync(userId);
@@ -117,8 +118,13 @@ namespace BookIt.Services.Implementations
         }
 
         //only owner can do this - used to confirm or reject appointment
-        public async Task<AppointmentResponseDto> UpdateAppointmentStatusAsync(int appointmentId, int userId, AppointmentStatus status)
+        public async Task<AppointmentResponseDto> UpdateAppointmentStatusAsync(int appointmentId, int userId, UpdateAppointmentDto updateAppointmentDto)
         {
+            if (updateAppointmentDto.Status != AppointmentStatus.Rejected 
+                && updateAppointmentDto.Status != AppointmentStatus.Confirmed)
+            {
+                throw new InvalidOperationException("Appointment status not valid!");
+            }
             var tenant = await _tenantRepository.GetMyTenantAsync(userId);
 
             if (tenant == null)
@@ -129,15 +135,17 @@ namespace BookIt.Services.Implementations
 
             var appointment = await GetAppointmentIfAuthorizedAsync(appointmentId, tenant.Id, isTenant: true);
 
-            appointment.Status = status;
+            appointment.Status = updateAppointmentDto.Status;
 
-            if (status == AppointmentStatus.Confirmed)
+            if (appointment.Status == AppointmentStatus.Confirmed)
             {
                 appointment.ConfirmedAt = DateTime.UtcNow;
+                appointment.TenantNote = updateAppointmentDto.Note;
             }
-            else if (status == AppointmentStatus.Rejected)
+            else if (appointment.Status == AppointmentStatus.Rejected)
             {
                 appointment.RejectedAt = DateTime.UtcNow;
+                appointment.RejectionReason = updateAppointmentDto.Note;
             }
 
             await _appointmentRepository.UpdateAsync();
@@ -145,29 +153,46 @@ namespace BookIt.Services.Implementations
             return GenerateResponse(appointment);
         }
 
-        public async Task<AppointmentResponseDto> CancelAppointmentAsync(int appointmentId, int userId, string? cancelationMessage)
+        public async Task<AppointmentResponseDto> CancelAppointmentAsync(int appointmentId, int userId, CancelAppointmentDto cancelAppointmentDto)
         {
-            var appointment = await GetAppointmentIfAuthorizedAsync(appointmentId, userId);
+            bool isTenant = false;
+            int idToCompare = userId;
+            
+            var tenant = await _tenantRepository.GetMyTenantAsync(userId);
+            
+            if (tenant != null)
+            {
+                isTenant = true;
+                idToCompare = tenant.Id;
+            }
+            //TODO IVANA: moram prvo provjeriti je li user koji se ulogirao i zeli cancel napraviti - tenant
+            //ako jeste onda to moram proslijediti ovdje + pogledati ima li ova metoda dobru logiku.
+            //nakon toga, ako je tenant null bio, onda ga ispod moram dohvatiti zbog ovog canclation without fee
+            var appointment = await GetAppointmentIfAuthorizedAsync(appointmentId, idToCompare, isTenant: isTenant);
 
-            //check if user has rights to cancel appointment without paying the fee
-            var tenant = await _tenantRepository.GetByIdAsync(appointment.TenantId);
+            //get tenant if by this point we know that user requesting cancelation is not tenant
+            if (tenant == null)
+            {
+                tenant = await _tenantRepository.GetByIdAsync(appointment.TenantId);
+            }
 
             if (tenant == null)
             {
-                //TODO: check - this should not happen? Something prior to this in flow will fail if tenant is null?
                 throw new KeyNotFoundException("Tenant not found.");
             }
+
+            //check if user has rights to cancel appointment without paying the fee
             var cancelationWithoutPayingFee = CancelWithoutPayingFee(appointment.Date, appointment.StartTime, tenant.Configuration?.CancellationHoursBefore);
 
             if (cancelationWithoutPayingFee == false)
             {
                 //TODO: implement logic for service payment because cancelation is late.
-                appointment.Note = "Late cancellation.";
+                appointment.TenantNote = "Late cancellation.";
             }
 
             appointment.Status = AppointmentStatus.Canceled;
             appointment.CanceledAt = DateTime.UtcNow;
-            appointment.CancellationReason = cancelationMessage;
+            appointment.CancellationReason = cancelAppointmentDto.CancelationMessage;
 
             await _appointmentRepository.UpdateAsync();
             return GenerateResponse(appointment);
@@ -190,10 +215,12 @@ namespace BookIt.Services.Implementations
                 RejectedAt = appointment.RejectedAt,
                 CanceledAt = appointment.CanceledAt,
                 CancellationReason = appointment.CancellationReason,
+                RejectionReason = appointment.RejectionReason,
                 Date = appointment.Date,
                 StartTime = appointment.StartTime,
                 EndTime = appointment.EndTime,
                 Note = appointment.Note,
+                TenantNote = appointment.TenantNote,
                 Status = appointment.Status
             };
         }

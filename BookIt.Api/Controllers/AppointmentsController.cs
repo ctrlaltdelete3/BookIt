@@ -1,16 +1,14 @@
 ﻿using BookIt.Application.DTOs.Appointment;
 using BookIt.Application.Interfaces.Services;
-using BookIt.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BookIt.Api.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class AppointmentsController : ControllerBase
+    public class AppointmentsController : BaseController
     {
         private readonly IAppointmentService _appointmentService;
         public AppointmentsController(IAppointmentService appointmentService)
@@ -51,33 +49,19 @@ namespace BookIt.Api.Controllers
         }
 
         [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateAppointmentAsync(int id, [FromBody] AppointmentStatus status)
+        public async Task<IActionResult> UpdateAppointmentAsync(int id, [FromBody] UpdateAppointmentDto updateAppointmentDto)
         {
             var userId = GetUserIdHelper();
-            var result = await _appointmentService.UpdateAppointmentStatusAsync(id, userId, status);
+            var result = await _appointmentService.UpdateAppointmentStatusAsync(id, userId, updateAppointmentDto);
             return Ok(result);
         }
 
         [HttpPut("{id}/cancel")]
-        public async Task<IActionResult> CancelAppointmentAsync(int id, [FromBody] string? cancelationMessage)
+        public async Task<IActionResult> CancelAppointmentAsync(int id, [FromBody] CancelAppointmentDto cancelAppointmentDto)
         {
             var userId = GetUserIdHelper();
-            var result = await _appointmentService.CancelAppointmentAsync(id, userId, cancelationMessage);
+            var result = await _appointmentService.CancelAppointmentAsync(id, userId, cancelAppointmentDto);
             return Ok(result);
         }
-
-
-        #region HelperMethods
-        private int GetUserIdHelper()
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString)
-                || int.TryParse(userIdString, out int id) == false)
-            {
-                throw new UnauthorizedAccessException("User not authenticated.");
-            }
-            return id;
-        }
-        #endregion
     }
 }

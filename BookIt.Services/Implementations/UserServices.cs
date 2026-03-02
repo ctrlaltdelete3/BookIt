@@ -65,28 +65,24 @@ namespace BookIt.Services.Implementations
             return response;
         }
 
-        public async Task<UserResponseDto> GetUserAsync(string? userId)
+        public async Task<UserResponseDto> GetUserAsync(int userId)
         {
-            if (string.IsNullOrEmpty(userId) == false
-                && int.TryParse(userId, out int id))
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
             {
-                var user = await _userRepository.GetByIdAsync(id);
-                if (user == null)
-                {
-                    throw new UnauthorizedAccessException("User not authenticated.");
-                }
-                var userResponseDto = new UserResponseDto
-                {
-                    UserId = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Phone = user.Phone,
-                    IsTenantOwner = user.IsTenantOwner,
-                    OwnedTenantId = user.OwnedTenantId
-                };
-                return userResponseDto;
+                throw new UnauthorizedAccessException("User not authenticated.");
             }
+            var userResponseDto = new UserResponseDto
+            {
+                UserId = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Phone = user.Phone,
+                IsTenantOwner = user.IsTenantOwner,
+                OwnedTenantId = user.OwnedTenantId
+            };
+            return userResponseDto;
 
             throw new UnauthorizedAccessException("User not authenticated.");
         }

@@ -2,14 +2,13 @@
 using BookIt.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BookIt.Api.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class TenantsController : ControllerBase
+    public class TenantsController : BaseController
     {
         private readonly ITenantService _tenantService;
         private readonly IServiceService _service;
@@ -69,18 +68,5 @@ namespace BookIt.Api.Controllers
             var response = await _tenantService.UpdateTenantAsync(id, updateTenantDto, userId);
             return Ok(response);
         }
-
-        #region HelperMethods
-        private int GetUserIdHelper()
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString)
-                || int.TryParse(userIdString, out int id) == false)
-            {
-                throw new UnauthorizedAccessException("User not authenticated.");
-            }
-            return id;
-        }
-        #endregion
     }
 }

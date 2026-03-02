@@ -2,14 +2,13 @@
 using BookIt.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BookIt.Api.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class ServicesController : ControllerBase
+    public class ServicesController : BaseController
     {
         private readonly IServiceService _service;
         private readonly ITenantService _tenantService;
@@ -52,18 +51,22 @@ namespace BookIt.Api.Controllers
             return Ok(result);
         }
 
-        //TODO: move somewhere? same method used in TenantController
-        #region HelperMethods
-        private int GetUserIdHelper()
+        [HttpPost("{id}/timeslots")]
+        public async Task<IActionResult> CreateTimeSlotsAsync(int id, [FromBody] List<CreateServiceTimeSlotDto> timeSlots)
         {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdString)
-                || int.TryParse(userIdString, out int id) == false)
-            {
-                throw new UnauthorizedAccessException("User not authenticated.");
-            }
-            return id;
+            var userId = GetUserIdHelper();
+            var tenant = await _tenantService.GetMyTenantAsync(userId);
+            await _service.CreateServiceTimeSlotsAsync(id, tenant.Id, timeSlots);
+            return Created();
         }
-        #endregion
+
+        [HttpDelete("{id}/timeslots/{slotId}")]
+        public async Task<IActionResult> DeleteTimeSlotAsync(int id, int slotId)
+        {
+            var userId = GetUserIdHelper();
+            var tenant = await _tenantService.GetMyTenantAsync(userId);
+            await _service.DeleteServiceTimeSlotAsync(id, tenant.Id, slotId);
+            return NoContent();
+        }
     }
 }

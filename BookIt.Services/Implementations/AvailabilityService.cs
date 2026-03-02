@@ -1,6 +1,7 @@
 ﻿using BookIt.Application.DTOs.Appointment;
 using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
+using BookIt.Domain.Entities;
 using BookIt.Domain.Enums;
 
 namespace BookIt.Services.Implementations
@@ -17,6 +18,8 @@ namespace BookIt.Services.Implementations
             _serviceRepository = serviceRepository;
         }
 
+        
+
         public async Task<List<AvailableSlotDto>> GetAvailableSlotsAsync(int tenantId, int serviceId, DateOnly date)
         {
             var tenant = await _tenantRepository.GetByIdAsync(tenantId);
@@ -32,10 +35,19 @@ namespace BookIt.Services.Implementations
                 throw new KeyNotFoundException("Service not found.");
             }
 
+            var availableTimeSlotsForDate = await GetAvailableTimeSlotsAsync(tenant, service, date);
+
+            return GenerateAvailableSlotsDto(availableTimeSlotsForDate, date, service.DurationMinutes);
+
+        }
+
+        public async Task<List<TimeOnly>> GetAvailableTimeSlotsAsync(Tenant tenant, Service service, DateOnly date)
+        {
             var appointmentDayOfWeek = (int)date.DayOfWeek;
 
             var workingDayForTenant = tenant.WorkingHours
-                                    .Any(h => h.DayOfWeek == appointmentDayOfWeek);
+                                    .Any(h => h.DayOfWeek == appointmentDayOfWeek
+                                        && h.IsWorkingDay);
 
             if (workingDayForTenant == false)
             {
@@ -52,7 +64,7 @@ namespace BookIt.Services.Implementations
                 throw new InvalidOperationException("This service is not available on current day of the week.");
             }
 
-            var appointmentsOfTheDay = await _appointmentRepository.GetAppointmentsByTenantAndDateAsync(tenantId, date);
+            var appointmentsOfTheDay = await _appointmentRepository.GetAppointmentsByTenantAndDateAsync(tenant.Id, date);
 
             var startTimeOfBookedAppointments = appointmentsOfTheDay
                                          .Where(a => a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed) //appointments that are confirmed or waiting for confirmation
@@ -60,8 +72,7 @@ namespace BookIt.Services.Implementations
 
             var startTimeOfAvailableTimeSlots = timeSlotsAvailableOnCurrentDate.Except(startTimeOfBookedAppointments).ToList();
 
-            return GenerateAvailableSlotsDto(startTimeOfAvailableTimeSlots, date, service.DurationMinutes);
-
+            return startTimeOfAvailableTimeSlots;
         }
 
         #region HelperMethods

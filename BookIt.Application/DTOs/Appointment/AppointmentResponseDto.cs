@@ -16,10 +16,12 @@ namespace BookIt.Application.DTOs.Appointment
         public TimeOnly EndTime { get; set; }
         public AppointmentStatus Status { get; set; } 
         public string? Note { get; set; }
+        public string? TenantNote { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ConfirmedAt { get; set; }
         public DateTime? RejectedAt { get; set; }
         public DateTime? CanceledAt { get; set; }
         public string? CancellationReason { get; set; }
+        public string? RejectionReason { get; set; }
     }
 }

@@ -2,13 +2,12 @@
 using BookIt.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BookIt.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
 
@@ -35,7 +34,7 @@ namespace BookIt.Api.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetUserAsync()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = GetUserIdHelper();
             var user = await _userService.GetUserAsync(userId);
             return Ok(user);
         }

@@ -47,7 +47,7 @@ namespace BookIt.DAL.Repositories
                     .Include(a => a.Tenant)
                     .Include(a => a.User)
                     .Include(a => a.Service)
-                    .Where(a => a.TenantId == tenantId)
+                    .Where(a => a.TenantId == tenantId && a.Status != AppointmentStatus.Canceled)
                     .ToListAsync();
         }
 
@@ -62,7 +62,7 @@ namespace BookIt.DAL.Repositories
                     .Include(a => a.User)
                     .Include(a => a.Tenant)
                     .Include(a => a.Service)
-                    .Where(a => a.UserId == userId)
+                    .Where(a => a.UserId == userId && a.Status != AppointmentStatus.Canceled)
                     .ToListAsync();
         }
 
@@ -78,24 +78,6 @@ namespace BookIt.DAL.Repositories
                     .Include(a => a.Tenant)
                     .Where(a => a.TenantId == tenantId && a.Date == date)
                     .ToListAsync();
-        }
-
-        /// <summary>
-        /// Check if requested date and time for an appointment are available
-        /// </summary>
-        /// <param name="date"></param>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        public async Task<bool> IsTimeSlotTaken(int tenantId, DateOnly date, TimeOnly time)
-        {
-            //TODO: currently it checks only if there is an appointment with the same date and time, but we should also check if the time slot is not taken by another appointment
-            //that overlaps with the requested time slot (note to self for later!!)
-            return await _context.Appointments
-                .AnyAsync(a => a.TenantId == tenantId
-                          && a.Date == date 
-                          && a.StartTime == time 
-                          && (a.Status == AppointmentStatus.Confirmed   
-                              || a.Status == AppointmentStatus.Pending));
         }
     }
 }

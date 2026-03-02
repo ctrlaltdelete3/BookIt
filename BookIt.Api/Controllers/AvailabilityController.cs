@@ -7,7 +7,7 @@ namespace BookIt.Api.Controllers
     [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
-    public class AvailabilityController : ControllerBase
+    public class AvailabilityController : BaseController
     {
         private readonly IAvailabilityService _availabilityService;
 

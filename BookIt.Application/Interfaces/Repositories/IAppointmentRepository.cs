@@ -30,13 +30,5 @@ namespace BookIt.Application.Interfaces.Repositories
         /// <param name="date"></param>
         /// <returns></returns>
         Task<List<Appointment>> GetAppointmentsByTenantAndDateAsync(int tenantId, DateOnly date);
-
-        /// <summary>
-        /// Check if requested date and time for an appointment are available
-        /// </summary>
-        /// <param name="date"></param>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        Task<bool> IsTimeSlotTaken(int tenantId, DateOnly date, TimeOnly time);
     }
 }

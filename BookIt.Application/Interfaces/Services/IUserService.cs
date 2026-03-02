@@ -6,6 +6,6 @@ namespace BookIt.Application.Interfaces.Services
     {
         Task<AuthResponseDto> RegisterAsync(RegisterRequestDto registerRequestDto);
         Task<AuthResponseDto> LoginAsync(LoginRequestDto loginRequestDto);
-        Task<UserResponseDto> GetUserAsync(string? userId);
+        Task<UserResponseDto> GetUserAsync(int userId);
     }
 }
