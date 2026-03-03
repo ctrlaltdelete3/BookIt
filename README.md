@@ -1,8 +1,8 @@
 # BookIt App
 
-This app is for booking all kinds of appointments (hairdressers, private gym sessions, all kinds of therapy sessions...). Main goal for the app is for it to make appointment management accessible to anyone, regardless of their technical background, and help small service providers run their business more efficiently.
+This app is for booking all kinds of appointments (appointments with hairdressers, beauticians, personal trainers, etc.). Main goal for the app is for it to make appointment management accessible to anyone, regardless of their technical background, and help small service providers run their business more efficiently.
 
-> **Note:** I started working on this app to sharpen up my .NET skills and learn some new technologies along the way.
+> _**Note:** I started working on this app to sharpen up my .NET skills and learn some new technologies along the way._
 
 ---
 
@@ -51,7 +51,7 @@ BookIt.Domain      → Entities
 
 ## Current Status
 
-### Done ✅
+### Done
 
 - User authentication
 - Tenant management
@@ -63,11 +63,11 @@ BookIt.Domain      → Entities
 - Global exception handling middleware
 - Input validation (FluentValidation) - User DTOs
 
-### In Progress 🚧
+### In Progress
 
 - Input validation (FluentValidation) — remaining DTOs
 
-### Planned 📋
+### Planned
 
 - Unit Tests
 - AutoMapper
@@ -82,6 +82,6 @@ BookIt.Domain      → Entities
 
 ## API Endpoints
 
-API endpoint documentation coming soon.
+_API endpoint documentation coming soon._
 
 ---
