@@ -2,7 +2,7 @@ using BookIt.Api.Filters;
 using BookIt.Api.Middleware;
 using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
-using BookIt.Application.Validators;
+using BookIt.Application.Validators.User;
 using BookIt.DAL.Context;
 using BookIt.DAL.Repositories;
 using BookIt.Services.Implementations;

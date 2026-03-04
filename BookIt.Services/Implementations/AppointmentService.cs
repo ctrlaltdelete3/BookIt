@@ -120,11 +120,6 @@ namespace BookIt.Services.Implementations
         //only owner can do this - used to confirm or reject appointment
         public async Task<AppointmentResponseDto> UpdateAppointmentStatusAsync(int appointmentId, int userId, UpdateAppointmentDto updateAppointmentDto)
         {
-            if (updateAppointmentDto.Status != AppointmentStatus.Rejected 
-                && updateAppointmentDto.Status != AppointmentStatus.Confirmed)
-            {
-                throw new InvalidOperationException("Appointment status not valid!");
-            }
             var tenant = await _tenantRepository.GetMyTenantAsync(userId);
 
             if (tenant == null)

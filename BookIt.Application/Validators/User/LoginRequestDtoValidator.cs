@@ -1,7 +1,7 @@
 ﻿using BookIt.Application.DTOs.User;
 using FluentValidation;
 
-namespace BookIt.Application.Validators
+namespace BookIt.Application.Validators.User
 {
     public class LoginRequestDtoValidator : AbstractValidator<LoginRequestDto>
     {

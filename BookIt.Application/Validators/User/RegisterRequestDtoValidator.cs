@@ -1,19 +1,19 @@
 ﻿using BookIt.Application.DTOs.User;
 using FluentValidation;
 
-namespace BookIt.Application.Validators
+namespace BookIt.Application.Validators.User
 {
     public class RegisterRequestDtoValidator : AbstractValidator<RegisterRequestDto>
     {
         public RegisterRequestDtoValidator()
         {
             RuleFor(x => x.FirstName)
-                .NotEmpty().WithMessage("First name is required")
+                .NotEmpty().WithMessage("First name is required.")
                 .MinimumLength(1).WithMessage("First name must be at least one character.")
                 .MaximumLength(50).WithMessage("First name cannot exceed length of 50 characters.");
 
             RuleFor(x => x.LastName)
-                .NotEmpty().WithMessage("Last name is required")
+                .NotEmpty().WithMessage("Last name is required.")
                 .MinimumLength(1).WithMessage("Last name must be at least one character.")
                 .MaximumLength(50).WithMessage("Last name cannot exceed length of 50 characters.");
 
