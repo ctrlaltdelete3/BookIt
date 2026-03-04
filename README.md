@@ -2,7 +2,7 @@
 
 This app is for booking all kinds of appointments (appointments with hairdressers, beauticians, personal trainers, etc.). Main goal for the app is for it to make appointment management accessible to anyone, regardless of their technical background, and help small service providers run their business more efficiently.
 
-> _**Note:** I started working on this app to sharpen up my .NET skills and learn some new technologies along the way._
+_**Note:** I started working on this app to sharpen up my .NET skills and learn new technologies along the way. The app is being built in iterations — the first version focuses on core booking functionality, while more advanced features are planned for later_
 
 ---
 
@@ -24,7 +24,7 @@ The idea behind this came from real-world situations - many small service provid
 
 ---
 
-## Tech Stack
+## Tech Stack@
 
 **Backend**
 
