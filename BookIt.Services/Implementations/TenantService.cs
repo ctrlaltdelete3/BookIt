@@ -2,6 +2,7 @@
 using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
 using BookIt.Domain.Entities;
+using BookIt.Domain.Enums;
 
 namespace BookIt.Services.Implementations
 {
@@ -47,7 +48,7 @@ namespace BookIt.Services.Implementations
                 OwnerUserId = ownerUserId,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                Configuration = null, //TODO: for now
+                Configuration = CreateGenericTenantConfiguration(),
                 Services = new List<Service>(),
             };
 
@@ -86,7 +87,7 @@ namespace BookIt.Services.Implementations
             var existingTenant = await _tenantRepository.GetByIdAsync(id);
             if (existingTenant == null)
             {
-               throw new KeyNotFoundException("Missing tenant.");
+                throw new KeyNotFoundException("Missing tenant.");
             }
             if (existingTenant.OwnerUserId != userId)
             {
@@ -138,6 +139,20 @@ namespace BookIt.Services.Implementations
                 IsActive = tenant.IsActive,
                 CreatedAt = tenant.CreatedAt
             };
+        }
+
+        //TODO: this is only temporary, there will be a separate flow for tenant configuration later on, and this will be removed
+        private TenantConfiguration CreateGenericTenantConfiguration()
+        {
+            var configuration = new TenantConfiguration
+            {
+                BookingWeeksAhead = 4,
+                AutoRejectHours = 12,
+                AllowCancellation = true,
+                CancellationHoursBefore = 24,
+                NotificationType = NotificationType.Email
+            };
+            return configuration;
         }
 
         #endregion

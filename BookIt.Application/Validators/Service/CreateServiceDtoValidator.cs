@@ -17,9 +17,11 @@ namespace BookIt.Application.Validators.Service
                 .GreaterThan(0).WithMessage("Service duration must be greater than zero.");
 
             RuleFor(x => x.BreakMinutesAfterService)
+                .NotNull().WithMessage("Break after service value is required.")
                 .GreaterThanOrEqualTo(0).WithMessage("Break after service value must be greater than or equal to zero.");
 
             RuleFor(x => x.Price)
+                .NotNull().WithMessage("Service price is required.")
                 .GreaterThanOrEqualTo(0).WithMessage("Service price must be greater than or equal to zero.");
         }
     }

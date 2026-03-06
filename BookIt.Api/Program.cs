@@ -8,6 +8,7 @@ using BookIt.DAL.Repositories;
 using BookIt.Services.Implementations;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -30,6 +31,26 @@ namespace BookIt.Api
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context => 
+                {
+                    var response = new BadRequestObjectResult(new
+                    {
+                        Message = "Validation failed",
+                        Errors = context.ModelState
+                            .Where(x => x.Value.Errors.Count > 0)
+                            .ToDictionary(
+                                x => x.Key,
+                                x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                            )
+                    });
+
+                    return response;
+
+                };
             });
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

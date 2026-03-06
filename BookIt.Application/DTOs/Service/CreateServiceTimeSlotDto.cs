@@ -2,7 +2,8 @@
 {
     public class CreateServiceTimeSlotDto
     {
-        public int DayOfWeek { get; set; }
+        //nullable needed for fluentValidator --> to catch if not provided, otherwise it'll be set to 0 and validation will pass
+        public int? DayOfWeek { get; set; }
         public TimeOnly StartTime { get; set; }
     }
 }

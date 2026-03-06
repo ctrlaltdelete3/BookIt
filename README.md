@@ -61,11 +61,11 @@ BookIt.Domain      → Entities
 - Appointment booking
 - Availability calculation
 - Global exception handling middleware
-- Input validation (FluentValidation) - User DTOs
+- Input validation (FluentValidation) - DTOs
 
 ### In Progress
 
-- Input validation (FluentValidation) — remaining DTOs
+- AutoMapper
 
 ### Planned
 

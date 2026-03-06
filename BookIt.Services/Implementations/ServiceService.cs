@@ -21,9 +21,9 @@ namespace BookIt.Services.Implementations
             {
                 Name = createServiceDto.Name,
                 Description = createServiceDto.Description,
-                Price = createServiceDto.Price,
+                Price = createServiceDto.Price.Value,
                 DurationMinutes = createServiceDto.DurationMinutes,
-                BreakMinutesAfterService = createServiceDto.BreakMinutesAfterService,
+                BreakMinutesAfterService = createServiceDto.BreakMinutesAfterService.Value,
                 IsActive = true,
                 TenantId = tenantId
             };
@@ -78,8 +78,8 @@ namespace BookIt.Services.Implementations
             service.Name = updateServiceDto.Name;
             service.Description = updateServiceDto.Description;
             service.DurationMinutes = updateServiceDto.DurationMinutes;
-            service.BreakMinutesAfterService = updateServiceDto.BreakMinutesAfterService;
-            service.Price = updateServiceDto.Price;
+            service.BreakMinutesAfterService = updateServiceDto.BreakMinutesAfterService.Value;
+            service.Price = updateServiceDto.Price.Value;
 
             await _serviceRepository.UpdateAsync(service);
             return await GenerateServiceResponseAsync(service);
@@ -108,7 +108,7 @@ namespace BookIt.Services.Implementations
             {
                 var timeSlot = new ServiceTimeSlot
                 {
-                    DayOfWeek = timeSlotDto.DayOfWeek,
+                    DayOfWeek = timeSlotDto.DayOfWeek.Value,
                     StartTime = timeSlotDto.StartTime,
                     IsActive = true,
                     ServiceId = serviceId

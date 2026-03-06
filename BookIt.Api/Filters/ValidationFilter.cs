@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookIt.Api.Filters
 {
@@ -22,6 +24,8 @@ namespace BookIt.Api.Filters
 
             var controllerName = context.Controller.GetType().Name;
             var actionName = context.ActionDescriptor.DisplayName;
+            Type? validatorType = null;
+            IValidator? validator = null;
 
             _logger.LogInformation("Validating request for {Controller}.{Action}", controllerName, actionName);
 
@@ -32,8 +36,52 @@ namespace BookIt.Api.Filters
                 if (argumentType == null || IsSimpleType(argumentType))
                     continue;
 
-                var validatorType = typeof(IValidator<>).MakeGenericType(argumentType);
-                var validator = _serviceProvider.GetService(validatorType) as IValidator;
+                //in case we have list of objects to validate, we need to validate each item in the list
+                if (argumentType.IsGenericType && argumentType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    var itemType = argumentType.GetGenericArguments()[0];
+                    validatorType = typeof(IValidator<>).MakeGenericType(itemType);
+                    validator = _serviceProvider.GetService(validatorType) as IValidator;
+
+                    if (validator != null)
+                    {
+                        var items = ((System.Collections.IEnumerable)argument.Value).Cast<object>();
+
+                        foreach (var item in items)
+                        {
+                            var validationContext = new ValidationContext<object>(item);
+                            var validationResult = await validator.ValidateAsync(validationContext);
+
+                            if (!validationResult.IsValid)
+                            {
+                                foreach (var error in validationResult.Errors)
+                                {
+                                    context.ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                                }
+                            }
+                        }
+
+                        if (!context.ModelState.IsValid)
+                        {
+                            context.Result = new BadRequestObjectResult(new
+                            {
+                                Message = "Validation failed",
+                                Errors = context.ModelState
+                                    .Where(x => x.Value.Errors.Count > 0)
+                                    .ToDictionary(
+                                        x => x.Key,
+                                        x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                                    )
+                            });
+                            return;
+                        }
+                    }
+
+                    continue;
+                }
+
+                validatorType = typeof(IValidator<>).MakeGenericType(argumentType);
+                validator = _serviceProvider.GetService(validatorType) as IValidator;
 
                 if (validator != null)
                 {
@@ -50,16 +98,7 @@ namespace BookIt.Api.Filters
                             context.ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
                         }
 
-                        context.Result = new BadRequestObjectResult(new
-                        {
-                            Message = "Validation failed",
-                            Errors = context.ModelState
-                                .Where(x => x.Value.Errors.Count > 0)
-                                .ToDictionary(
-                                    x => x.Key,
-                                    x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                                )
-                        });
+                        context.Result = GenerateErrorResponse(context.ModelState);
 
                         return;
                     }
@@ -81,6 +120,21 @@ namespace BookIt.Api.Filters
                 || type == typeof(DateTimeOffset)
                 || type == typeof(TimeSpan)
                 || type == typeof(Guid);
+        }
+
+        private BadRequestObjectResult GenerateErrorResponse(ModelStateDictionary modelState)
+        {
+            var response = new BadRequestObjectResult(new
+            {
+                Message = "Validation failed",
+                Errors = modelState
+                                    .Where(x => x.Value.Errors.Count > 0)
+                                    .ToDictionary(
+                                        x => x.Key,
+                                        x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                                    )
+            });
+            return response;
         }
     }
 }

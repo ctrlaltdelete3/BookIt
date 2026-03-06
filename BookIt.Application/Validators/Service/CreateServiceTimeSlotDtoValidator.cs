@@ -8,6 +8,7 @@ namespace BookIt.Application.Validators.Service
         public CreateServiceTimeSlotDtoValidator()
         {
             RuleFor(x => x.DayOfWeek)
+                .NotNull().WithMessage("Day of week information is required.")
                 .InclusiveBetween(0,6).WithMessage("Day of week information is required. It must be between 0 (sunday) and 6 (saturday).");
 
             RuleFor(x => x.StartTime)
