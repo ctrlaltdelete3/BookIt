@@ -1,4 +1,5 @@
 using BookIt.Api.Filters;
+using BookIt.Api.Helpers;
 using BookIt.Api.Middleware;
 using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
@@ -37,19 +38,7 @@ namespace BookIt.Api
             {
                 options.InvalidModelStateResponseFactory = context => 
                 {
-                    var response = new BadRequestObjectResult(new
-                    {
-                        Message = "Validation failed",
-                        Errors = context.ModelState
-                            .Where(x => x.Value.Errors.Count > 0)
-                            .ToDictionary(
-                                x => x.Key,
-                                x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                            )
-                    });
-
-                    return response;
-
+                    return ResponseHelper.GenerateErrorResponse(context.ModelState);
                 };
             });
 

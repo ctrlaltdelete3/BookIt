@@ -1,8 +1,9 @@
-﻿using FluentValidation;
+﻿using BookIt.Api.Helpers;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 
 namespace BookIt.Api.Filters
 {
@@ -52,27 +53,18 @@ namespace BookIt.Api.Filters
                             var validationContext = new ValidationContext<object>(item);
                             var validationResult = await validator.ValidateAsync(validationContext);
 
-                            if (!validationResult.IsValid)
+                            if (validationResult.IsValid == false)
                             {
-                                foreach (var error in validationResult.Errors)
-                                {
-                                    context.ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                                }
+                                ValidationFailed(validationResult.Errors, context, argumentType.Name, controllerName, actionName);
+                                continue;
                             }
+
+                            _logger.LogInformation("Validation passed for {Type} in {Controller}.{Action}", argumentType.Name, controllerName, actionName);
                         }
 
                         if (!context.ModelState.IsValid)
                         {
-                            context.Result = new BadRequestObjectResult(new
-                            {
-                                Message = "Validation failed",
-                                Errors = context.ModelState
-                                    .Where(x => x.Value.Errors.Count > 0)
-                                    .ToDictionary(
-                                        x => x.Key,
-                                        x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                                    )
-                            });
+                            context.Result = ResponseHelper.GenerateErrorResponse(context.ModelState);
                             return;
                         }
                     }
@@ -88,18 +80,10 @@ namespace BookIt.Api.Filters
                     var validationContext = new ValidationContext<object>(argument.Value);
                     var validationResult = await validator.ValidateAsync(validationContext);
 
-                    if (!validationResult.IsValid)
+                    if (validationResult.IsValid == false)
                     {
-                        _logger.LogWarning("Validation failed for {Type} in {Controller}.{Action}: {Errors}", argumentType.Name, controllerName,
-                            actionName, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-
-                        foreach (var error in validationResult.Errors)
-                        {
-                            context.ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                        }
-
-                        context.Result = GenerateErrorResponse(context.ModelState);
-
+                        ValidationFailed(validationResult.Errors, context, argumentType.Name, controllerName, actionName);
+                        context.Result = ResponseHelper.GenerateErrorResponse(context.ModelState);
                         return;
                     }
 
@@ -122,19 +106,17 @@ namespace BookIt.Api.Filters
                 || type == typeof(Guid);
         }
 
-        private BadRequestObjectResult GenerateErrorResponse(ModelStateDictionary modelState)
+        private void ValidationFailed(List<ValidationFailure> validationErrors, ActionExecutingContext context, 
+            string argumentTypeName, string controllerName, string actionName )
         {
-            var response = new BadRequestObjectResult(new
-            {
-                Message = "Validation failed",
-                Errors = modelState
-                                    .Where(x => x.Value.Errors.Count > 0)
-                                    .ToDictionary(
-                                        x => x.Key,
-                                        x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                                    )
-            });
-            return response;
+                _logger.LogWarning("Validation failed for {Type} in {Controller}.{Action}: {Errors}", argumentTypeName, controllerName,
+                    actionName, string.Join(", ", validationErrors.Select(e => e.ErrorMessage)));
+
+                foreach (var error in validationErrors)
+                {
+                    context.ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+
         }
     }
 }

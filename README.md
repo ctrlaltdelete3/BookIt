@@ -24,7 +24,7 @@ The idea behind this came from real-world situations - many small service provid
 
 ---
 
-## Tech Stack@
+## Tech Stack
 
 **Backend**
 
@@ -70,7 +70,6 @@ BookIt.Domain      → Entities
 ### Planned
 
 - Unit Tests
-- AutoMapper
 - Email notifications
 - Viber notifications
 - React frontend
