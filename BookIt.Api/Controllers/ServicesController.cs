@@ -11,11 +11,9 @@ namespace BookIt.Api.Controllers
     public class ServicesController : BaseController
     {
         private readonly IServiceService _service;
-        private readonly ITenantService _tenantService;
-        public ServicesController(IServiceService service, ITenantService tenantService)
+        public ServicesController(IServiceService service)
         {
             _service = service;
-            _tenantService = tenantService;
         }
 
         [AllowAnonymous]
@@ -29,7 +27,7 @@ namespace BookIt.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateServiceAsync(int id, [FromBody] UpdateServiceDto updateServiceDto)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var result = await _service.UpdateServiceAsync(id, updateServiceDto, userId);
             return Ok(result);
         }
@@ -37,7 +35,7 @@ namespace BookIt.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteServiceAsync(int id)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             await _service.DeleteServiceAsync(id, userId);
             return NoContent();
         }
@@ -45,27 +43,24 @@ namespace BookIt.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateServiceAsync([FromBody] CreateServiceDto createServiceDto)
         {
-            var userId = GetUserIdHelper();
-            var tenant = await _tenantService.GetMyTenantAsync(userId);
-            var result = await _service.CreateServiceAsync(createServiceDto, tenant.Id);
+            var userId = GetUserId();
+            var result = await _service.CreateServiceAsync(createServiceDto, userId);
             return Ok(result);
         }
 
         [HttpPost("{id}/timeslots")]
         public async Task<IActionResult> CreateTimeSlotsAsync(int id, [FromBody] List<CreateServiceTimeSlotDto> timeSlots)
         {
-            var userId = GetUserIdHelper();
-            var tenant = await _tenantService.GetMyTenantAsync(userId);
-            await _service.CreateServiceTimeSlotsAsync(id, tenant.Id, timeSlots);
+            var userId = GetUserId();
+            await _service.CreateServiceTimeSlotsAsync(id, userId, timeSlots);
             return Created();
         }
 
         [HttpDelete("{id}/timeslots/{slotId}")]
         public async Task<IActionResult> DeleteTimeSlotAsync(int id, int slotId)
         {
-            var userId = GetUserIdHelper();
-            var tenant = await _tenantService.GetMyTenantAsync(userId);
-            await _service.DeleteServiceTimeSlotAsync(id, tenant.Id, slotId);
+            var userId = GetUserId();
+            await _service.DeleteServiceTimeSlotAsync(id, userId, slotId);
             return NoContent();
         }
     }

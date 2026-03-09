@@ -19,7 +19,7 @@ namespace BookIt.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAppointmentByIdAsync(int id)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var result = await _appointmentService.GetAppointmentByIdAsync(id, userId);
             return Ok(result);
         }
@@ -27,7 +27,7 @@ namespace BookIt.Api.Controllers
         [HttpGet("my")]
         public async Task<IActionResult> GetMyAppointmentsAsync()
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var result = await _appointmentService.GetMyAppointmentsAsync(userId);
             return Ok(result);
         }
@@ -35,7 +35,7 @@ namespace BookIt.Api.Controllers
         [HttpGet("tenant")]
         public async Task<IActionResult> GetTenantAppointmentsAsync()
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var result = await _appointmentService.GetTenantAppointmentsAsync(userId);
             return Ok(result);
         }
@@ -43,7 +43,7 @@ namespace BookIt.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAppointmentAsync([FromBody] CreateAppointmentDto createAppointmentDto)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var result = await _appointmentService.CreateAppointmentAsync(createAppointmentDto, userId);
             return Created($"/api/appointments/{result.Id}", result);
         }
@@ -51,7 +51,7 @@ namespace BookIt.Api.Controllers
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateAppointmentAsync(int id, [FromBody] UpdateAppointmentDto updateAppointmentDto)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var result = await _appointmentService.UpdateAppointmentStatusAsync(id, userId, updateAppointmentDto);
             return Ok(result);
         }
@@ -59,7 +59,7 @@ namespace BookIt.Api.Controllers
         [HttpPut("{id}/cancel")]
         public async Task<IActionResult> CancelAppointmentAsync(int id, [FromBody] CancelAppointmentDto cancelAppointmentDto)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var result = await _appointmentService.CancelAppointmentAsync(id, userId, cancelAppointmentDto);
             return Ok(result);
         }

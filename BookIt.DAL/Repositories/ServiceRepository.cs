@@ -25,6 +25,7 @@ namespace BookIt.DAL.Repositories
             var service = await _context.Services
                 .Include(s => s.Tenant)
                 .Include(s=>s.TimeSlots)
+                .Where(s => s.IsActive)
                 .FirstOrDefaultAsync(s => s.Id == id);
             return service;
         }
@@ -38,7 +39,7 @@ namespace BookIt.DAL.Repositories
             return service;
         }
 
-        public async Task UpdateAsync(Service service)
+        public async Task UpdateAsync()
         {
             await _context.SaveChangesAsync();
         }

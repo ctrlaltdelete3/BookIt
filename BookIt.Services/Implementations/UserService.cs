@@ -5,11 +5,11 @@ using BookIt.Domain.Entities;
 
 namespace BookIt.Services.Implementations
 {
-    public class UserServices : IUserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
-        public UserServices(IUserRepository userRepository, IJwtService jwtService)
+        public UserService(IUserRepository userRepository, IJwtService jwtService)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
@@ -83,8 +83,6 @@ namespace BookIt.Services.Implementations
                 OwnedTenantId = user.OwnedTenantId
             };
             return userResponseDto;
-
-            throw new UnauthorizedAccessException("User not authenticated.");
         }
 
         public AuthResponseDto GenerateResponse(User user)

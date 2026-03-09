@@ -27,7 +27,7 @@ namespace BookIt.Api.Middleware
             }
         }
 
-        public Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             HttpStatusCode statusCode;
             string errorMessage = string.Empty;

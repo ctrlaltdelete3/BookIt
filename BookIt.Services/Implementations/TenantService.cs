@@ -104,7 +104,7 @@ namespace BookIt.Services.Implementations
             existingTenant.ContactEmail = updateTenantDto.ContactEmail;
             existingTenant.ContactPhone = updateTenantDto.ContactPhone;
 
-            await _tenantRepository.UpdateAsync(existingTenant);
+            await _tenantRepository.UpdateAsync();
             return GenerateTenantResponse(existingTenant);
 
         }

@@ -8,7 +8,7 @@ namespace BookIt.Application.Interfaces.Repositories
         Task<Tenant?> GetByIdAsync(int id);
         Task<Tenant?> GetBySlugAsync(string slug);
         Task<bool> SlugExistsAsync(string slug);
-        Task UpdateAsync(Tenant tenant);
+        Task UpdateAsync();
         Task<Tenant?> GetMyTenantAsync(int ownerUserId);
     }
 }

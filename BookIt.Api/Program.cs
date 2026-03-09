@@ -61,7 +61,7 @@ namespace BookIt.Api
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
                 };
             });
 
@@ -71,7 +71,7 @@ namespace BookIt.Api
             builder.Services.AddScoped<IWorkingHourRepository, WorkingHourRepository>();
             builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
-            builder.Services.AddScoped<IUserService, UserServices>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITenantService, TenantService>();
             builder.Services.AddScoped<IServiceService, ServiceService>();
             builder.Services.AddScoped<IWorkingHourService, WorkingHourService>();

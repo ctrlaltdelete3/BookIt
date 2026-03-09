@@ -22,27 +22,29 @@ namespace BookIt.Services.Implementations
 
         public async Task<List<AvailableSlotDto>> GetAvailableSlotsAsync(int tenantId, int serviceId, DateOnly date)
         {
-            var tenant = await _tenantRepository.GetByIdAsync(tenantId);
             var service = await _serviceRepository.GetByIdAsync(serviceId);
+            if (service == null)
+            {
+                throw new KeyNotFoundException("Service not found.");
+            }
+
+            var availableTimeSlotsForDate = await GetAvailableTimeSlotsAsync(tenantId, service, date);
+
+            return GenerateAvailableSlotsDto(availableTimeSlotsForDate, date, service.DurationMinutes);
+
+        }
+
+        #region HelperMethods
+
+        private async Task<List<TimeOnly>> GetAvailableTimeSlotsAsync(int tenantId, Service service, DateOnly date)
+        {
+            var tenant = await _tenantRepository.GetByIdAsync(tenantId);
 
             if (tenant == null)
             {
                 throw new KeyNotFoundException("Tenant not found.");
             }
 
-            if (service == null)
-            {
-                throw new KeyNotFoundException("Service not found.");
-            }
-
-            var availableTimeSlotsForDate = await GetAvailableTimeSlotsAsync(tenant, service, date);
-
-            return GenerateAvailableSlotsDto(availableTimeSlotsForDate, date, service.DurationMinutes);
-
-        }
-
-        public async Task<List<TimeOnly>> GetAvailableTimeSlotsAsync(Tenant tenant, Service service, DateOnly date)
-        {
             var appointmentDayOfWeek = (int)date.DayOfWeek;
 
             var workingDayForTenant = tenant.WorkingHours
@@ -75,7 +77,6 @@ namespace BookIt.Services.Implementations
             return startTimeOfAvailableTimeSlots;
         }
 
-        #region HelperMethods
         private List<AvailableSlotDto> GenerateAvailableSlotsDto(List<TimeOnly> startTimes, DateOnly date, int serviceDurationInMinutes)
         {
             var list = new List<AvailableSlotDto>();
