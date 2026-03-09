@@ -5,7 +5,7 @@ namespace BookIt.Api.Controllers
 {
     public class BaseController : ControllerBase
     {
-        protected int GetUserIdHelper()
+        protected int GetUserId()
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdString)

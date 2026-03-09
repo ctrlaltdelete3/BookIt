@@ -34,7 +34,7 @@ namespace BookIt.Api.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetUserAsync()
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var user = await _userService.GetUserAsync(userId);
             return Ok(user);
         }

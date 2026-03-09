@@ -15,8 +15,14 @@ namespace BookIt.Services.Implementations
             _tenantRepository = tenantRepository;
         }
 
-        public async Task<ServiceResponseDto> CreateServiceAsync(CreateServiceDto createServiceDto, int tenantId)
+        public async Task<ServiceResponseDto> CreateServiceAsync(CreateServiceDto createServiceDto, int userId)
         {
+            var tenant = await _tenantRepository.GetMyTenantAsync(userId);
+            if (tenant == null)
+            {
+                throw new KeyNotFoundException("Tenant not found.");
+            }
+
             var service = new Service
             {
                 Name = createServiceDto.Name,
@@ -25,7 +31,7 @@ namespace BookIt.Services.Implementations
                 DurationMinutes = createServiceDto.DurationMinutes,
                 BreakMinutesAfterService = createServiceDto.BreakMinutesAfterService.Value,
                 IsActive = true,
-                TenantId = tenantId
+                TenantId = tenant.Id
             };
 
             await _serviceRepository.CreateAsync(service);
@@ -70,7 +76,7 @@ namespace BookIt.Services.Implementations
             var service = await _serviceRepository.GetByIdAsync(serviceId);
             if (service == null)
             {
-                throw new KeyNotFoundException("Requested service not found.");
+                throw new KeyNotFoundException("Requested service not found or it may be deleted.");
             }
 
             await CheckAuthorizationBeforeChangesAsync(userId, service.TenantId);
@@ -81,7 +87,7 @@ namespace BookIt.Services.Implementations
             service.BreakMinutesAfterService = updateServiceDto.BreakMinutesAfterService.Value;
             service.Price = updateServiceDto.Price.Value;
 
-            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.UpdateAsync();
             return await GenerateServiceResponseAsync(service);
         }
 
@@ -90,19 +96,25 @@ namespace BookIt.Services.Implementations
             var service = await _serviceRepository.GetByIdAsync(serviceId);
             if (service == null)
             {
-                throw new KeyNotFoundException("Requested service not found.");
+                throw new KeyNotFoundException("Requested service not found or it may be deleted.");
             }
 
             await CheckAuthorizationBeforeChangesAsync(userId, service.TenantId);
 
             //soft delete
             service.IsActive = false;
-            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.UpdateAsync();
         }
 
-        public async Task CreateServiceTimeSlotsAsync(int serviceId, int tenantId, List<CreateServiceTimeSlotDto> timeSlots)
+        public async Task CreateServiceTimeSlotsAsync(int serviceId, int userId, List<CreateServiceTimeSlotDto> timeSlots)
         {
-            var service = await GetServiceIfAuthorizedAsync(tenantId, serviceId);
+            var tenant = await _tenantRepository.GetMyTenantAsync(userId);
+            if (tenant == null)
+            {
+                throw new KeyNotFoundException("Tenant not found.");
+            }
+
+            var service = await GetServiceIfAuthorizedAsync(tenant.Id, serviceId);
 
             foreach (var timeSlotDto in timeSlots)
             {
@@ -115,22 +127,28 @@ namespace BookIt.Services.Implementations
                 };
                 service.TimeSlots.Add(timeSlot);
             }
-            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.UpdateAsync();
             //TODO: maybe add serivceTimeSlots to ServiceResponseDTO and return it here?
         }
 
-        public async Task DeleteServiceTimeSlotAsync(int serviceId, int tenantId, int serviceTimeSlotId)
+        public async Task DeleteServiceTimeSlotAsync(int serviceId, int userId, int serviceTimeSlotId)
         {
-            var service = await GetServiceIfAuthorizedAsync(tenantId, serviceId);
+            var tenant = await _tenantRepository.GetMyTenantAsync(userId);
+            if (tenant == null)
+            {
+                throw new KeyNotFoundException("Tenant not found.");
+            }
+
+            var service = await GetServiceIfAuthorizedAsync(tenant.Id, serviceId);
             var timeSlot = service.TimeSlots.FirstOrDefault(t => t.Id == serviceTimeSlotId);
-            
+
             if (timeSlot == null)
             {
                 throw new KeyNotFoundException("Requested time slot not found.");
             }
-            
+
             timeSlot.IsActive = false;
-            await _serviceRepository.UpdateAsync(service);
+            await _serviceRepository.UpdateAsync();
         }
 
         #region HelperMethods
@@ -167,19 +185,11 @@ namespace BookIt.Services.Implementations
             return service;
         }
 
-        private async Task<ServiceResponseDto> GenerateServiceResponseAsync(Service service, string tenantName = null)
+        private async Task<ServiceResponseDto> GenerateServiceResponseAsync(Service service, string? tenantName = null)
         {
-
             if (string.IsNullOrEmpty(tenantName))
             {
-                var tenant = await _tenantRepository.GetByIdAsync(service.TenantId);
-
-                if (tenant == null)
-                {
-                    throw new KeyNotFoundException("Tenant not found.");
-                }
-
-                tenantName = tenant.Name;
+                tenantName = service.Tenant.Name;
             }
 
             var serviceResponseDto = new ServiceResponseDto

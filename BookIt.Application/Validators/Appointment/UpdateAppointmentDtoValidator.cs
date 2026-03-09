@@ -9,7 +9,6 @@ namespace BookIt.Application.Validators.Appointment
         public UpdateAppointmentDtoValidator()
         {
             RuleFor(x => x.Status)
-                .NotEmpty().WithMessage("Appointment status is required.")
                 .Must(s => s == AppointmentStatus.Confirmed || s == AppointmentStatus.Rejected).WithMessage("Status can only be set to 'Confirmed' or 'Rejected'."); ;
         }
     }

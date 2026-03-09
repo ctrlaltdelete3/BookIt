@@ -7,6 +7,6 @@ namespace BookIt.Application.Interfaces.Repositories
         Task CreateAsync(Service service);
         Task<Service?> GetByIdAsync(int id);
         Task<List<Service>> GetByTenantIdAsync(int tenantId);
-        Task UpdateAsync(Service service);
+        Task UpdateAsync();
     }
 }

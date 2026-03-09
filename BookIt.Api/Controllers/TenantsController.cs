@@ -24,7 +24,7 @@ namespace BookIt.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTenantAsync([FromBody] CreateTenantDto createTenantDto)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var tenantResponse = await _tenantService.CreateTenantAsync(createTenantDto, userId);
             return Ok(tenantResponse);
         }
@@ -32,7 +32,7 @@ namespace BookIt.Api.Controllers
         [HttpGet("my")]
         public async Task<IActionResult> GetMyTenant()
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var response = await _tenantService.GetMyTenantAsync(userId);
             return Ok(response);
         }
@@ -64,7 +64,7 @@ namespace BookIt.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTenantAsync([FromBody] UpdateTenantDto updateTenantDto, int id)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var response = await _tenantService.UpdateTenantAsync(id, updateTenantDto, userId);
             return Ok(response);
         }

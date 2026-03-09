@@ -36,7 +36,7 @@ namespace BookIt.DAL.Repositories
                 .FirstOrDefaultAsync(t => t.Slug == slug);
         }
 
-        public async Task UpdateAsync(Tenant tenant)
+        public async Task UpdateAsync()
         {
             await _context.SaveChangesAsync();
         }

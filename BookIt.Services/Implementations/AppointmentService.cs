@@ -9,45 +9,35 @@ namespace BookIt.Services.Implementations
     public class AppointmentService : IAppointmentService
     {
         private readonly IAppointmentRepository _appointmentRepository;
-        private readonly IServiceRepository _serviceRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly IAvailabilityService _availabilityService;
 
-        public AppointmentService(IAppointmentRepository appointmentRepository, IServiceRepository serviceRepository, 
-            ITenantRepository tenantRepository, IAvailabilityService availabilityService)
+        public AppointmentService(IAppointmentRepository appointmentRepository, ITenantRepository tenantRepository, IAvailabilityService availabilityService)
         {
             _appointmentRepository = appointmentRepository;
-            _serviceRepository = serviceRepository;
             _tenantRepository = tenantRepository;
             _availabilityService = availabilityService;
         }
 
         public async Task<AppointmentResponseDto> CreateAppointmentAsync(CreateAppointmentDto appointmentDto, int userId)
         {
-            var service = await _serviceRepository.GetByIdAsync(appointmentDto.ServiceId);
-            if (service == null)
-            {
-                throw new KeyNotFoundException("Requested service not found.");
-            }
-            var tenant = await _tenantRepository.GetByIdAsync(appointmentDto.TenantId);
-            if (tenant == null)
-            {
-                throw new KeyNotFoundException("Tenant not found.");
-            }
-
             //check if requested date is still available for this service
-            var listOfAvailableTimeSlots = await _availabilityService.GetAvailableTimeSlotsAsync(tenant, service, appointmentDto.Date);
-            if (listOfAvailableTimeSlots.Any(t => t == appointmentDto.StartTime) == false)
+
+            var listOfAvailableTimeSlots = await _availabilityService.GetAvailableSlotsAsync(appointmentDto.TenantId, appointmentDto.ServiceId, appointmentDto.Date);
+            var appointmentTimeSlot = listOfAvailableTimeSlots.FirstOrDefault(t => t.StartTime == appointmentDto.StartTime);
+            if (appointmentTimeSlot == null)
             {
                 throw new InvalidOperationException("Requested appointment date and/or time is not available.");
             }
+
+            var serviceDurationTime = appointmentTimeSlot.EndTime - appointmentTimeSlot.StartTime;
 
             var appointment = new Appointment
             {
                 Date = appointmentDto.Date,
                 Note = appointmentDto.Note,
                 StartTime = appointmentDto.StartTime,
-                EndTime = appointmentDto.StartTime.AddMinutes(service.DurationMinutes),
+                EndTime = appointmentDto.StartTime.Add(serviceDurationTime),
                 TenantId = appointmentDto.TenantId,
                 ServiceId = appointmentDto.ServiceId,
                 UserId = userId,
@@ -152,9 +142,9 @@ namespace BookIt.Services.Implementations
         {
             bool isTenant = false;
             int idToCompare = userId;
-            
+
             var tenant = await _tenantRepository.GetMyTenantAsync(userId);
-            
+
             if (tenant != null)
             {
                 isTenant = true;
@@ -247,7 +237,7 @@ namespace BookIt.Services.Implementations
             if (compareBoth)
             {
                 if (idToCompare != appointment.UserId
-                    && idToCompare != appointment.TenantId)
+                    && idToCompare != appointment.Tenant.OwnerUserId)
                 {
                     throw new UnauthorizedAccessException("You are not authorized.");
                 }

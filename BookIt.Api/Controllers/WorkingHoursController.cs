@@ -22,7 +22,7 @@ namespace BookIt.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> SetWorkingHours([FromBody] List<WorkingHourDto> workingHours)
         {
-            var userId = GetUserIdHelper();
+            var userId = GetUserId();
             var tenant = await _tenantService.GetMyTenantAsync(userId);
             var response = await _workingHourService.SetWorkingHoursAsync(userId, tenant.Id, workingHours);
             return Ok(response);
