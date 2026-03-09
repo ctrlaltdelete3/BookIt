@@ -30,14 +30,12 @@ namespace BookIt.Services.Implementations
                 throw new InvalidOperationException("Requested appointment date and/or time is not available.");
             }
 
-            var serviceDurationTime = appointmentTimeSlot.EndTime - appointmentTimeSlot.StartTime;
-
             var appointment = new Appointment
             {
                 Date = appointmentDto.Date,
                 Note = appointmentDto.Note,
                 StartTime = appointmentDto.StartTime,
-                EndTime = appointmentDto.StartTime.Add(serviceDurationTime),
+                EndTime = appointmentTimeSlot.EndTime,
                 TenantId = appointmentDto.TenantId,
                 ServiceId = appointmentDto.ServiceId,
                 UserId = userId,
