@@ -31,7 +31,8 @@ namespace BookIt.Services.Implementations
                 DurationMinutes = createServiceDto.DurationMinutes,
                 BreakMinutesAfterService = createServiceDto.BreakMinutesAfterService.Value,
                 IsActive = true,
-                TenantId = tenant.Id
+                TenantId = tenant.Id,
+                Tenant = tenant
             };
 
             await _serviceRepository.CreateAsync(service);
@@ -64,7 +65,7 @@ namespace BookIt.Services.Implementations
 
             foreach (var service in services)
             {
-                var serviceResponse = await GenerateServiceResponseAsync(service, tenant.Name);
+                var serviceResponse = await GenerateServiceResponseAsync(service);
                 responses.Add(serviceResponse);
             }
 
@@ -185,13 +186,8 @@ namespace BookIt.Services.Implementations
             return service;
         }
 
-        private async Task<ServiceResponseDto> GenerateServiceResponseAsync(Service service, string? tenantName = null)
+        private async Task<ServiceResponseDto> GenerateServiceResponseAsync(Service service)
         {
-            if (string.IsNullOrEmpty(tenantName))
-            {
-                tenantName = service.Tenant.Name;
-            }
-
             var serviceResponseDto = new ServiceResponseDto
             {
                 Id = service.Id,
@@ -202,7 +198,7 @@ namespace BookIt.Services.Implementations
                 DurationMinutes = service.DurationMinutes,
                 IsActive = service.IsActive,
                 TenantId = service.TenantId,
-                TenantName = tenantName
+                TenantName = service.Tenant.Name
             };
 
             return serviceResponseDto;
