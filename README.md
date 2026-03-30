@@ -33,7 +33,7 @@ The idea behind this came from real-world situations - many small service provid
 
 **Frontend**
 
-- React (learning opportunity for myself)
+- Angular (learning opportunity for myself)
 
 ---
 
@@ -72,8 +72,8 @@ BookIt.Domain      → Entities
 - Unit Tests
 - Email notifications
 - Viber notifications
-- React frontend
-- React Native mobile app
+- Angular frontend
+- Ionic mobile app (maybe, in future plans)
 - All my TODO comments resolved (I try to have clean code so I will leave no unresolved comments in the end)
 - And some other cool stuff - stay tuned
 
