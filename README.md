@@ -73,6 +73,7 @@ BookIt.Domain      → Entities
 - Email notifications
 - Viber notifications
 - Angular frontend
+- Refresh token implementation
 - Ionic mobile app (maybe, in future plans)
 - All my TODO comments resolved (I try to have clean code so I will leave no unresolved comments in the end)
 - And some other cool stuff - stay tuned
