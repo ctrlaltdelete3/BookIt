@@ -36,7 +36,7 @@ namespace BookIt.Api
 
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
-                options.InvalidModelStateResponseFactory = context => 
+                options.InvalidModelStateResponseFactory = context =>
                 {
                     return ResponseHelper.GenerateErrorResponse(context.ModelState);
                 };
@@ -44,6 +44,15 @@ namespace BookIt.Api
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngular", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
             builder.Services.AddDbContext<BookItDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddAuthentication(options =>
@@ -94,6 +103,8 @@ namespace BookIt.Api
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAngular");
 
             app.UseAuthentication();
 
