@@ -4,4 +4,5 @@
   <Project Path="BookIt.DAL/BookIt.DAL.csproj" />
   <Project Path="BookIt.Domain/BookIt.Domain.csproj" />
   <Project Path="BookIt.Services/BookIt.Services.csproj" />
+  <Project Path="BookIt.Tests/BookIt.Tests.csproj" />
 </Solution>

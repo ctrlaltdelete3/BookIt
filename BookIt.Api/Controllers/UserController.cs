@@ -30,6 +30,8 @@ namespace BookIt.Api.Controllers
             return Ok(response);
         }
 
+        //TODO: implement logout method! - remove token --> implement refresh token logic 
+
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetUserAsync()
