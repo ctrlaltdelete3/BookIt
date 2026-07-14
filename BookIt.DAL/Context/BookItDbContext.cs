@@ -18,6 +18,7 @@ namespace BookIt.DAL.Context
         public DbSet<TenantConfiguration> TenantConfigurations { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WorkingHour> WorkingHours { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,7 +57,7 @@ namespace BookIt.DAL.Context
                 .HasForeignKey(sa => sa.TenantId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // ServiceTimeSlot - NoAction za Service (will delete via Service cascade)
+            // ServiceTimeSlot - NoAction for Service (will delete via Service cascade)
             modelBuilder.Entity<ServiceTimeSlot>()
                 .HasOne(sts => sts.Service)
                 .WithMany(s => s.TimeSlots)
@@ -76,6 +77,11 @@ namespace BookIt.DAL.Context
             // FavoriteTenant
             modelBuilder.Entity<FavoriteTenant>()
                 .HasIndex(ft => new { ft.UserId, ft.TenantId })
+                .IsUnique();
+
+            //RefreshToken
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => rt.Token)
                 .IsUnique();
         }
     }
