@@ -4,8 +4,8 @@ namespace BookIt.Application.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<AuthResponseDto> RegisterAsync(RegisterRequestDto registerRequestDto);
-        Task<AuthResponseDto> LoginAsync(LoginRequestDto loginRequestDto);
+        Task<AuthResultDto> RegisterAsync(RegisterRequestDto registerRequestDto);
+        Task<AuthResultDto> LoginAsync(LoginRequestDto loginRequestDto);
         Task<UserResponseDto> GetUserAsync(int userId);
     }
 }

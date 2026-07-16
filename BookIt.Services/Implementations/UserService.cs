@@ -9,13 +9,15 @@ namespace BookIt.Services.Implementations
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
-        public UserService(IUserRepository userRepository, IJwtService jwtService)
+        private readonly IRefreshTokenService _refreshTokenService;
+        public UserService(IUserRepository userRepository, IJwtService jwtService, IRefreshTokenService refreshTokenService)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
+            _refreshTokenService = refreshTokenService;
         }
 
-        public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto registerRequestDto)
+        public async Task<AuthResultDto> RegisterAsync(RegisterRequestDto registerRequestDto)
         {
             if (await _userRepository.EmailExistsAsync(registerRequestDto.Email))
             {
@@ -39,12 +41,12 @@ namespace BookIt.Services.Implementations
 
             await _userRepository.CreateAsync(user);
 
-            var response = GenerateResponse(user);
-
-            return response;
+            return await GenerateAuthResult(user);
         }
 
-        public async Task<AuthResponseDto> LoginAsync(LoginRequestDto loginRequestDto)
+
+
+        public async Task<AuthResultDto> LoginAsync(LoginRequestDto loginRequestDto)
         {
             var user = await _userRepository.GetByEmailAsync(loginRequestDto.Email);
 
@@ -60,9 +62,7 @@ namespace BookIt.Services.Implementations
                 throw new UnauthorizedAccessException("Invalid password");
             }
 
-            var response = GenerateResponse(user);
-
-            return response;
+            return await GenerateAuthResult(user);
         }
 
         public async Task<UserResponseDto> GetUserAsync(int userId)
@@ -98,6 +98,18 @@ namespace BookIt.Services.Implementations
                 ExpiresAt = DateTime.UtcNow.AddMinutes(1440),
                 IsTenantOwner = user.IsTenantOwner
             };
+        }
+
+        private async Task<AuthResultDto> GenerateAuthResult(User user)
+        {
+            var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user.Id);
+            var authResultDto = new AuthResultDto
+            {
+                AuthResponseDto = GenerateResponse(user),
+                RefreshToken = refreshToken
+            };
+
+            return authResultDto;
         }
     }
 }
