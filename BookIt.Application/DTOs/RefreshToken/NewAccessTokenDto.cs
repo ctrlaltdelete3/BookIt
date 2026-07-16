@@ -1,6 +1,6 @@
 ﻿namespace BookIt.Application.DTOs.RefreshToken
 {
-    public class RefreshTokenDto
+    public class NewAccessTokenDto
     {
         public string AccessToken { get; set; }
     }

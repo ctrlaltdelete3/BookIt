@@ -5,7 +5,7 @@ namespace BookIt.Application.Interfaces.Services
     public interface IRefreshTokenService
     {
         Task<string> CreateRefreshTokenAsync(int userId);
-        Task<RefreshTokenDto?> GenerateNewAccessTokenAsync(string token);
+        Task<NewAccessTokenDto?> GenerateNewAccessTokenAsync(string token);
         Task RevokeRefreshTokenAsync(string token);
     }
 }

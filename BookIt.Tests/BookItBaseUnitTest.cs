@@ -38,6 +38,7 @@ namespace BookIt.Tests
         protected ServiceRepository ServiceRepository { get; private set; } = null!;
         protected WorkingHourRepository WorkingHourRepository { get; private set; } = null!;
         protected AppointmentRepository AppointmentRepository { get; private set; } = null!;
+        protected RefreshTokenRepository RefreshTokenRepository { get; private set; } = null!;
 
         // services
         protected UserService UserService { get; private set; } = null!;
@@ -46,6 +47,8 @@ namespace BookIt.Tests
         protected WorkingHourService WorkingHourService { get; private set; } = null!;
         protected AvailabilityService AvailabilityService { get; private set; } = null!;
         protected AppointmentService AppointmentService { get; private set; } = null!;
+        protected RefreshTokenService RefreshTokenService { get; private set; } = null!;
+
 
         protected BookItBaseUnitTest()
         {
@@ -198,11 +201,13 @@ namespace BookIt.Tests
             ServiceRepository = new ServiceRepository(Context);
             WorkingHourRepository = new WorkingHourRepository(Context);
             AppointmentRepository = new AppointmentRepository(Context);
+            RefreshTokenRepository = new RefreshTokenRepository(Context);
         }
 
         private void SetupServices()
         {
-            UserService = new UserService(UserRepository, JwtServiceMock.Object);
+            RefreshTokenService = new RefreshTokenService(RefreshTokenRepository, JwtServiceMock.Object);
+            UserService = new UserService(UserRepository, JwtServiceMock.Object, RefreshTokenService);
             TenantService = new TenantService(TenantRepository, UserRepository);
             ServiceService = new ServiceService(ServiceRepository, TenantRepository);
             WorkingHourService = new WorkingHourService(WorkingHourRepository, TenantRepository);

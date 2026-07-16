@@ -16,7 +16,7 @@ namespace BookIt.Services.Implementations
             _jwtService = jwtService;
         }
 
-        public async Task<RefreshTokenDto?> GenerateNewAccessTokenAsync(string token)
+        public async Task<NewAccessTokenDto?> GenerateNewAccessTokenAsync(string token)
         {
             var refreshToken = await _refreshTokenRepository.GetAsync(token);
             if (refreshToken == null)
@@ -32,7 +32,7 @@ namespace BookIt.Services.Implementations
             var accessToken = _jwtService.GenerateToken(refreshToken.User);
 
 
-            var refreshTokenDto = new RefreshTokenDto
+            var refreshTokenDto = new NewAccessTokenDto
             {
                 AccessToken = accessToken
             };

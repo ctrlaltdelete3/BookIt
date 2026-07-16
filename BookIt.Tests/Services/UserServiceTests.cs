@@ -22,8 +22,8 @@ namespace BookIt.Tests.Services
             var result = await UserService.RegisterAsync(dto);
 
             Assert.NotNull(result);
-            Assert.Equal("fake-token", result.Token);
-            Assert.Equal(dto.Email, result.Email);
+            Assert.Equal("fake-token", result.AuthResponseDto.Token);
+            Assert.Equal(dto.Email, result.AuthResponseDto.Email);
         }
 
         [Fact]
@@ -50,8 +50,8 @@ namespace BookIt.Tests.Services
             var result = await UserService.LoginAsync(dto);
 
             Assert.NotNull(result);
-            Assert.Equal("fake-token", result.Token);
-            Assert.Equal(ClientUser.Email, result.Email);
+            Assert.Equal("fake-token", result.AuthResponseDto.Token);
+            Assert.Equal(ClientUser.Email, result.AuthResponseDto.Email);
         }
 
         [Fact]
