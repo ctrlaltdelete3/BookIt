@@ -29,7 +29,7 @@ namespace BookIt.DAL.Context
                 .HasOne(ft => ft.User)
                 .WithMany(u => u.FavoriteTenants)
                 .HasForeignKey(ft => ft.UserId)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<FavoriteTenant>()
                 .HasOne(ft => ft.Tenant)
@@ -42,7 +42,7 @@ namespace BookIt.DAL.Context
                 .HasOne(a => a.User)
                 .WithMany(u => u.Appointments)
                 .HasForeignKey(a => a.UserId)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Service)
@@ -83,6 +83,12 @@ namespace BookIt.DAL.Context
             modelBuilder.Entity<RefreshToken>()
                 .HasIndex(rt => rt.Token)
                 .IsUnique();
+
+            //unique index for Appointment on TenantId, ServiceId, Date, StartTime, EndTime - to prevent double booking for the same time slot for the same tenant
+            modelBuilder.Entity<Appointment>()
+                .HasIndex(a => new { a.TenantId, a.ServiceId, a.Date, a.StartTime, a.EndTime })
+                .IsUnique()
+                .HasFilter("[Status] in (0,1)");
         }
     }
 }

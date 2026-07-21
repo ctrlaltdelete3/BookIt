@@ -3,6 +3,7 @@ using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
 using BookIt.Domain.Entities;
 using BookIt.Domain.Enums;
+using BookIt.Domain.Exceptions;
 
 namespace BookIt.Services.Implementations
 {
@@ -43,7 +44,14 @@ namespace BookIt.Services.Implementations
                 Status = AppointmentStatus.Pending,
             };
 
-            await _appointmentRepository.CreateAsync(appointment);
+            try
+            {
+                await _appointmentRepository.CreateAsync(appointment);
+            }
+            catch (DuplicateAppointmentException)
+            {
+                throw new InvalidOperationException("Netko je upravo rezervirao ovaj termin. Molim Vas da odaberete drugi.");
+            }
 
             var appointmentDbo = await _appointmentRepository.GetByIdAsync(appointment.Id);
 

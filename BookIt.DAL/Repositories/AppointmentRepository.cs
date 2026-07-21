@@ -2,6 +2,7 @@
 using BookIt.DAL.Context;
 using BookIt.Domain.Entities;
 using BookIt.Domain.Enums;
+using BookIt.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookIt.DAL.Repositories
@@ -17,8 +18,15 @@ namespace BookIt.DAL.Repositories
 
         public async Task CreateAsync(Appointment appointment)
         {
-            _context.Appointments.Add(appointment);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Appointments.Add(appointment);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException exception)
+            {
+                throw new DuplicateAppointmentException("Ovaj termin je upravo rezerviran.", exception);
+            }
         }
 
         public async Task<Appointment?> GetByIdAsync(int id)
