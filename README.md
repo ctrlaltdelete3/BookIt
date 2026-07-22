@@ -62,18 +62,17 @@ BookIt.Domain      → Entities
 - Availability calculation
 - Global exception handling middleware
 - Input validation (FluentValidation) - DTOs
-
-### In Progress
-
-- AutoMapper
+- Unit tests (service layer)
+- Refresh token authentication (short-lived access token + HttpOnly cookie refresh token)
+- Angular frontend ([bookit-frontend](../bookit-frontend))
+- Appointment double-booking prevention (DB-level unique constraint on tenant/service/date/time + friendly error message on conflict)
 
 ### Planned
 
-- Unit Tests
+- Dynamic slot computation — calculate available appointment slots directly from working hours minus existing bookings, instead of relying on manually configured fixed time slots per service
+- AutoMapper (replace current manual DTO mapping)
 - Email notifications
 - Viber notifications
-- Angular frontend
-- Refresh token implementation
 - Ionic mobile app (maybe, in future plans)
 - All my TODO comments resolved (I try to have clean code so I will leave no unresolved comments in the end)
 - And some other cool stuff - stay tuned
@@ -83,5 +82,18 @@ BookIt.Domain      → Entities
 ## API Endpoints
 
 _API endpoint documentation coming soon._
+
+---
+
+## Known Limitations
+
+These are known gaps, tracked for follow-up — not oversights.
+
+- **FluentValidation validators have no dedicated tests** — existing tests call services directly, bypassing the `ValidationFilter` pipeline where validators actually run
+- **Tenant owners can't view or reactivate their own soft-deleted services** — deleting a service hides it from the owner too, with no way to see or restore it
+- **No cross-field validation on working hours** — a day marked as a working day isn't required to have start/end/pause times filled in
+- **No redirect back to the originally requested page** after login or a failed silent token refresh — user always lands on the default page instead
+- **`User`/`Tenant` shared fields (`Id`, `CreatedAt`, contact info) aren't factored into a common base class** — planned as a pure C#/OOP cleanup, no schema change
+- **`xunit` v2 → v3 migration pending** (low priority, current version still receives security patches)
 
 ---
