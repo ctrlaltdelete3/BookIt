@@ -12,6 +12,8 @@ namespace BookIt.Domain.Entities
 
         public TimeOnly StartTime { get; set; }
 
+        public TimeOnly EndTime { get; set; }
+
         // tenant može deaktivirati slot bez brisanja
         public bool IsActive { get; set; } = true;
 

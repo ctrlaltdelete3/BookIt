@@ -29,6 +29,15 @@ namespace BookIt.Application.Interfaces.Repositories
         /// <param name="tenantId"></param>
         /// <param name="date"></param>
         /// <returns></returns>
-        Task<List<Appointment>> GetAppointmentsByTenantAndDateAsync(int tenantId, DateOnly date);
+        Task<List<Appointment>> GetAllAppointmentsByTenantAndDateAsync(int tenantId, DateOnly date);
+
+        /// <summary>
+        /// Get list of all appointments for tenant for one date - by tenant ID and Date info, 
+        /// but only those that are not canceled or rejected
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        Task<List<Appointment>> GetFilteredAppointmentsByTenantAndDateAsync(int tenantId, DateOnly date);
     }
 }

@@ -80,11 +80,28 @@ namespace BookIt.DAL.Repositories
         /// <param name="tenantId"></param>
         /// <param name="date"></param>
         /// <returns></returns>
-        public async Task<List<Appointment>> GetAppointmentsByTenantAndDateAsync(int tenantId, DateOnly date)
+        public async Task<List<Appointment>> GetAllAppointmentsByTenantAndDateAsync(int tenantId, DateOnly date)
         {
             return await _context.Appointments
                     .Include(a => a.Tenant)
                     .Where(a => a.TenantId == tenantId && a.Date == date)
+                    .ToListAsync();
+        }
+
+        /// <summary>
+        /// Get list of all appointments for tenant for one date - by tenant ID and Date info, 
+        /// but only those that are not canceled or rejected
+        /// </summary>
+        /// <param name="tenantId"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+
+        public async Task<List<Appointment>> GetFilteredAppointmentsByTenantAndDateAsync(int tenantId, DateOnly date)
+        {
+            return await _context.Appointments
+                    .Where(a => a.TenantId == tenantId && a.Date == date)
+                    .Where(a => a.Status != AppointmentStatus.Canceled && a.Status != AppointmentStatus.Rejected)
+                    .OrderBy(a => a.StartTime) //we need this when we calcuate available time slots for a given date
                     .ToListAsync();
         }
     }
