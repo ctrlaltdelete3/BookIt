@@ -107,50 +107,6 @@ namespace BookIt.Services.Implementations
             await _serviceRepository.UpdateAsync();
         }
 
-        public async Task CreateServiceTimeSlotsAsync(int serviceId, int userId, List<CreateServiceTimeSlotDto> timeSlots)
-        {
-            var tenant = await _tenantRepository.GetMyTenantAsync(userId);
-            if (tenant == null)
-            {
-                throw new KeyNotFoundException("Tenant not found.");
-            }
-
-            var service = await GetServiceIfAuthorizedAsync(tenant.Id, serviceId);
-
-            foreach (var timeSlotDto in timeSlots)
-            {
-                var timeSlot = new ServiceTimeSlot
-                {
-                    DayOfWeek = timeSlotDto.DayOfWeek.Value,
-                    StartTime = timeSlotDto.StartTime,
-                    IsActive = true,
-                    ServiceId = serviceId
-                };
-                service.TimeSlots.Add(timeSlot);
-            }
-            await _serviceRepository.UpdateAsync();
-            //TODO: maybe add serivceTimeSlots to ServiceResponseDTO and return it here?
-        }
-
-        public async Task DeleteServiceTimeSlotAsync(int serviceId, int userId, int serviceTimeSlotId)
-        {
-            var tenant = await _tenantRepository.GetMyTenantAsync(userId);
-            if (tenant == null)
-            {
-                throw new KeyNotFoundException("Tenant not found.");
-            }
-
-            var service = await GetServiceIfAuthorizedAsync(tenant.Id, serviceId);
-            var timeSlot = service.TimeSlots.FirstOrDefault(t => t.Id == serviceTimeSlotId);
-
-            if (timeSlot == null)
-            {
-                throw new KeyNotFoundException("Requested time slot not found.");
-            }
-
-            timeSlot.IsActive = false;
-            await _serviceRepository.UpdateAsync();
-        }
 
         #region HelperMethods
 
@@ -167,23 +123,6 @@ namespace BookIt.Services.Implementations
             {
                 throw new UnauthorizedAccessException("You are not authorized to make changes.");
             }
-        }
-
-        private async Task<Service> GetServiceIfAuthorizedAsync(int tenantId, int serviceId)
-        {
-            var service = await _serviceRepository.GetByIdAsync(serviceId);
-
-            if (service == null)
-            {
-                throw new KeyNotFoundException("Requested service not found.");
-            }
-
-            if (service.TenantId != tenantId)
-            {
-                throw new UnauthorizedAccessException("You are not authorized to make changes.");
-            }
-
-            return service;
         }
 
         private async Task<ServiceResponseDto> GenerateServiceResponseAsync(Service service)

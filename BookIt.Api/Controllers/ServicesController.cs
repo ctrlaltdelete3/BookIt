@@ -47,21 +47,5 @@ namespace BookIt.Api.Controllers
             var result = await _service.CreateServiceAsync(createServiceDto, userId);
             return Ok(result);
         }
-
-        [HttpPost("{id}/timeslots")]
-        public async Task<IActionResult> CreateTimeSlotsAsync(int id, [FromBody] List<CreateServiceTimeSlotDto> timeSlots)
-        {
-            var userId = GetUserId();
-            await _service.CreateServiceTimeSlotsAsync(id, userId, timeSlots);
-            return Created();
-        }
-
-        [HttpDelete("{id}/timeslots/{slotId}")]
-        public async Task<IActionResult> DeleteTimeSlotAsync(int id, int slotId)
-        {
-            var userId = GetUserId();
-            await _service.DeleteServiceTimeSlotAsync(id, userId, slotId);
-            return NoContent();
-        }
     }
 }

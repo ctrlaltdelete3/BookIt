@@ -132,11 +132,6 @@ namespace BookIt.Tests
                 Price = 20m,
                 IsActive = true,
                 TenantId = OwnerTenant.Id,
-                TimeSlots = new List<ServiceTimeSlot>
-                {
-                    new ServiceTimeSlot { DayOfWeek = 1, StartTime = new TimeOnly(9, 0), IsActive = true },
-                    new ServiceTimeSlot { DayOfWeek = 1, StartTime = new TimeOnly(10, 0), IsActive = true }
-                }
             };
 
             InactiveService = new Service

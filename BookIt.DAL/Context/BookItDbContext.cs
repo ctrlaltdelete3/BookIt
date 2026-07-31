@@ -13,7 +13,6 @@ namespace BookIt.DAL.Context
         public DbSet<FavoriteTenant> FavoriteTenants { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<ServiceAvailability> ServiceAvailabilities { get; set; }
-        public DbSet<ServiceTimeSlot> ServiceTimeSlots { get; set; }
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<TenantConfiguration> TenantConfigurations { get; set; }
         public DbSet<User> Users { get; set; }
@@ -55,13 +54,6 @@ namespace BookIt.DAL.Context
                 .HasOne(sa => sa.Tenant)
                 .WithMany()
                 .HasForeignKey(sa => sa.TenantId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            // ServiceTimeSlot - NoAction for Service (will delete via Service cascade)
-            modelBuilder.Entity<ServiceTimeSlot>()
-                .HasOne(sts => sts.Service)
-                .WithMany(s => s.TimeSlots)
-                .HasForeignKey(sts => sts.ServiceId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // User - Email unique

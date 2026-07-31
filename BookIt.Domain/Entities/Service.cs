@@ -19,7 +19,6 @@
         public bool IsActive { get; set; } = true;
 
         public ICollection<ServiceAvailability> Availabilities { get; set; } = new List<ServiceAvailability>();
-        public ICollection<ServiceTimeSlot> TimeSlots { get; set; } = new List<ServiceTimeSlot>();
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 

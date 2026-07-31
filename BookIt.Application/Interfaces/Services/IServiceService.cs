@@ -9,7 +9,5 @@ namespace BookIt.Application.Interfaces.Services
         Task<List<ServiceResponseDto>> GetAllServicesByTenant(string slug);
         Task<ServiceResponseDto> GetByIdAsync(int serviceId);
         Task<ServiceResponseDto> UpdateServiceAsync(int serviceId, UpdateServiceDto updateServiceDto, int userId);
-        Task CreateServiceTimeSlotsAsync(int serviceId, int userId, List<CreateServiceTimeSlotDto> timeSlots);
-        Task DeleteServiceTimeSlotAsync(int serviceId, int userId, int serviceTimeSlotId);
     }
 }

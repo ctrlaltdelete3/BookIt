@@ -2,6 +2,7 @@
 using BookIt.Application.Interfaces.Repositories;
 using BookIt.Application.Interfaces.Services;
 using BookIt.Domain.Entities;
+using BookIt.Services.Models;
 
 namespace BookIt.Services.Implementations
 {
@@ -59,16 +60,16 @@ namespace BookIt.Services.Implementations
             //TODO: i think i need more basic model for time slots.
             //time slots that are available for this service on selected day. 
             //if there is a break, then time slots will be split into two parts, before and after the break.
-            var timeSlotsOfTheDay = new List<ServiceTimeSlot>();
+            var timeSlotsOfTheDay = new List<TimeSlot>();
             if (workingHours.PauseStart != null)
             {
-                timeSlotsOfTheDay.Add(new ServiceTimeSlot
+                timeSlotsOfTheDay.Add(new TimeSlot
                 {
                     StartTime = workingHours.StartTime.Value,
                     EndTime = workingHours.PauseStart.Value,
                 });
 
-                timeSlotsOfTheDay.Add(new ServiceTimeSlot
+                timeSlotsOfTheDay.Add(new TimeSlot
                 {
                     StartTime = workingHours.PauseEnd.Value,
                     EndTime = workingHours.EndTime.Value
@@ -77,7 +78,7 @@ namespace BookIt.Services.Implementations
             }
             else
             {
-                timeSlotsOfTheDay.Add(new ServiceTimeSlot
+                timeSlotsOfTheDay.Add(new TimeSlot
                 {
                     StartTime = workingHours.StartTime.Value,
                     EndTime = workingHours.EndTime.Value,
@@ -105,7 +106,7 @@ namespace BookIt.Services.Implementations
                             var oldTimeSlotOfTheDayEndTime = timeSlotsOfTheDay[j].EndTime;
 
                             timeSlotsOfTheDay[j].EndTime = appointmentsOfTheDay[i].StartTime;
-                            timeSlotsOfTheDay.Add(new ServiceTimeSlot
+                            timeSlotsOfTheDay.Add(new TimeSlot
                             {
                                 StartTime = appointmentsOfTheDay[i].EndTime,
                                 EndTime = oldTimeSlotOfTheDayEndTime,
