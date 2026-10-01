@@ -50,16 +50,17 @@ namespace BookIt.Services.Implementations
         {
             var user = await _userRepository.GetByEmailAsync(loginRequestDto.Email);
 
+            // same message for wrong email and wrong password - otherwise an attacker could find out which emails have an account
             if (user == null)
             {
-                throw new UnauthorizedAccessException("Invalid email.");
+                throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(loginRequestDto.Password, user.PasswordHash);
 
             if (isPasswordValid == false)
             {
-                throw new UnauthorizedAccessException("Invalid password");
+                throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
             return await GenerateAuthResult(user);
